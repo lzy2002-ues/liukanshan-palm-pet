@@ -33,7 +33,7 @@ describe("encounter Mock adapter", () => {
     if (response.data.status !== "matched") return;
 
     expect(response.data.content_type).toBe("zhihu_article");
-    expect(response.data.source).toBe("zhihu_search");
+    expect(response.data.source).toBe("demo");
     expect(response.data.can_support).toBe(false);
     expect(response.data.support_options).toEqual([]);
     expect(response.data.zhihu_content?.url).toContain("zhihu.com");

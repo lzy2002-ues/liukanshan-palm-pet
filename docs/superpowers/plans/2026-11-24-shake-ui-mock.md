@@ -36,11 +36,11 @@
 **Interfaces:**
 - Produces `requestEncounter(input: ShakeRequest): Promise<ShakeResponse>` and `sendSupport(encounterId, input): Promise<SupportResponse>`.
 
-- [ ] **Step 1: Write failing adapter tests** for a peer encounter, a Zhihu encounter, an empty encounter, and support idempotency.
-- [ ] **Step 2: Run `npm test -- --run src/api/encounterApi.test.ts`** and verify failure because the adapter is absent.
-- [ ] **Step 3: Implement DTO types and a deterministic Mock adapter** that mirrors the API contract.
-- [ ] **Step 4: Re-run the adapter tests** and verify they pass.
-- [ ] **Step 5: Commit** contract adapter work.
+- [x] **Step 1: Write failing adapter tests** for a peer encounter, a Zhihu encounter, an empty encounter, and support idempotency.
+- [x] **Step 2: Run `npm test -- --run src/api/encounterApi.test.ts`** and verify failure because the adapter is absent.
+- [x] **Step 3: Implement DTO types and a deterministic Mock adapter** that mirrors the API contract.
+- [x] **Step 4: Re-run the adapter tests** and verify they pass.
+- [x] **Step 5: Commit** contract adapter work.
 
 ### Task 2: Build the device state model
 
@@ -51,11 +51,11 @@
 - Consumes: `ShakeResponse`, `SupportResponse`.
 - Produces: `DeviceState`, `DeviceAction`, `deviceReducer(state, action)`.
 
-- [ ] **Step 1: Write failing reducer tests** for avatar confirmation, matching lock, peer/Zhihu/empty branching, and support-to-letter transition.
-- [ ] **Step 2: Run `npm test -- --run src/state/deviceReducer.test.ts`** and verify failure because reducer is absent.
-- [ ] **Step 3: Implement the minimal reducer**, keeping async API calls outside reducer.
-- [ ] **Step 4: Re-run reducer tests** and verify they pass.
-- [ ] **Step 5: Commit** state-model work.
+- [x] **Step 1: Write failing reducer tests** for avatar confirmation, matching lock, peer/Zhihu/empty branching, and support-to-letter transition.
+- [x] **Step 2: Run `npm test -- --run src/state/deviceReducer.test.ts`** and verify failure because reducer is absent.
+- [x] **Step 3: Implement the minimal reducer**, keeping async API calls outside reducer.
+- [x] **Step 4: Re-run reducer tests** and verify they pass.
+- [x] **Step 5: Commit** state-model work.
 
 ### Task 3: Compose the interactive browser Mock
 
@@ -68,12 +68,12 @@
 - Consumes `requestEncounter`, `sendSupport`, and `deviceReducer`.
 - Produces browser interaction for avatar onboarding, short conversation, compact Zhihu suggestion, shake, matching, encounter display, support and letter reading.
 
-- [ ] **Step 1: Write failing app tests** that select an avatar, continue a short conversation, trigger a Mock shake, and send a support action.
-- [ ] **Step 2: Run `npm test -- --run src/App.test.tsx`** and verify failure because UI is absent.
-- [ ] **Step 3: Implement accessible device screens and interaction wiring** using contract fields as `data-*` / visible source labels.
-- [ ] **Step 4: Implement the 480×480 visual system**: ice-grey canvas, rounded hardware frame, placeholder fox, cards, envelope and no speaker affordance.
-- [ ] **Step 5: Re-run UI tests** and verify they pass.
-- [ ] **Step 6: Commit** interactive Mock work.
+- [x] **Step 1: Write failing app tests** that select an avatar, continue a short conversation, trigger a Mock shake, and send a support action.
+- [x] **Step 2: Run `npm test -- --run src/App.test.tsx`** and verify failure because UI is absent.
+- [x] **Step 3: Implement accessible device screens and interaction wiring** using contract fields as `data-*` / visible source labels.
+- [x] **Step 4: Implement the 480×480 visual system**: ice-grey canvas, rounded hardware frame, placeholder fox, cards, envelope and no speaker affordance.
+- [x] **Step 5: Re-run UI tests** and verify they pass.
+- [x] **Step 6: Commit** interactive Mock work.
 
 ### Task 4: Verify and document handoff
 
@@ -83,10 +83,10 @@
 **Interfaces:**
 - Documents `npm install`, `npm run dev`, and Mock-to-real adapter replacement point.
 
-- [ ] **Step 1: Add run instructions and documented ESP32 / backend handoff boundaries.**
-- [ ] **Step 2: Run `npm test -- --run` and `npm run build`.**
-- [ ] **Step 3: Manually preview the primary peer and Zhihu branches.**
-- [ ] **Step 4: Record outcome in team memory and commit.**
+- [x] **Step 1: Add run instructions and documented ESP32 / backend handoff boundaries.**
+- [x] **Step 2: Run `npm test -- --run` and `npm run build`.**
+- [x] **Step 3: Manually preview the primary peer and Zhihu branches.**
+- [x] **Step 4: Record outcome in team memory and commit.**
 
 ## Self-Review
 

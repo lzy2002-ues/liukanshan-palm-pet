@@ -86,14 +86,14 @@ describe("deviceReducer", () => {
     expect(state.encounter?.support_options).toEqual([]);
   });
 
-  it("turns a delivered support into a new unread letter", () => {
+  it("confirms a sent support without incorrectly showing the sender a new letter", () => {
     const encounterState = deviceReducer(createInitialDeviceState("liukanshan_01"), {
       type: "encounter_received",
       encounter: peerEncounter,
     });
-    const letterState = deviceReducer(encounterState, { type: "support_delivered" });
+    const sentState = deviceReducer(encounterState, { type: "support_delivered" });
 
-    expect(letterState.screen).toBe("letter");
-    expect(letterState.unreadLetters).toBe(1);
+    expect(sentState.screen).toBe("support_sent");
+    expect(sentState.unreadLetters).toBe(0);
   });
 });

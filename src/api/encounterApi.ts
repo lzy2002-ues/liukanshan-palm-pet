@@ -39,7 +39,7 @@ const zhihuEncounter: Encounter = {
   encounter_id: "enc_zhihu_001",
   match_mode: "contextual",
   content_type: "zhihu_article",
-  source: "zhihu_search",
+  source: "demo",
   content_id: "123456789",
   title: "求职低谷期，如何恢复节奏？",
   summary: "一位答主分享了自己调整求职心态的方法，或许能给你一点新的视角。",
@@ -54,7 +54,7 @@ const zhihuEncounter: Encounter = {
     author_avatar: null,
     vote_up_count: 128,
     comment_count: 15,
-    search_hash_id: "search_hash_demo_001",
+    search_hash_id: null,
   },
   created_at: createdAt,
 };

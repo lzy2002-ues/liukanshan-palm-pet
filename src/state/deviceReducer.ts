@@ -7,6 +7,7 @@ export type DeviceScreen =
   | "matching"
   | "encounter"
   | "empty"
+  | "support_sent"
   | "letter";
 
 export interface ConversationBubble {
@@ -70,7 +71,7 @@ export function deviceReducer(state: DeviceState, action: DeviceAction): DeviceS
       }
       return { ...state, encounter: action.encounter, screen: "encounter" };
     case "support_delivered":
-      return { ...state, screen: "letter", unreadLetters: state.unreadLetters + 1 };
+      return { ...state, screen: "support_sent" };
     case "open_letter":
       return { ...state, screen: "letter" };
     case "go_home":

@@ -10,6 +10,14 @@
 - 决定：首次登录后选择六套固定匿名形象；后端只保存 `pet_avatar_id`，图片资源由客户端映射。
 - 待办：完成摇一摇浏览器 Mock；后端按 `SHAKE_MODULE_API_CONTRACT.md` 实现 Mock API；硬件到位后标定 IMU 摇动阈值。
 
+### 2026-11-24 — 摇一摇浏览器 Mock 与联调骨架
+
+- 完成：在 `codex/shake-ui` 建立 Vite + React + TypeScript 的 480×480 掌机 Mock，覆盖六套匿名形象选择、短对话、知乎经验卡、摇一摇匹配、匿名助力与来信。
+- 完成：`src/contracts.ts` 和 `src/api/encounterApi.ts` 以 `SHAKE_MODULE_API_CONTRACT.md` 的字段实现了可替换 Mock 适配层；界面不直接调用知乎或保存任何密钥。当前知乎卡刻意标注为 `source=demo` 的演示内容。
+- 决定：设备端对话只展示本轮转写、一条短回应和一张紧凑知乎卡；长内容留给手机/Web。暂不接扬声器播放。助力发送方只看到“已送出”，来信仍只由原作者的消息接口驱动。
+- 验证：`npm test -- --run` 通过（12 项）；`npm run build` 通过；已手工预览首页和匿名情绪奇遇卡。
+- 待办：后端实现契约路由后替换 Mock 适配层；ESP32 到位后标定 IMU 摇动阈值并由 LVGL 复用状态/字段。
+
 ## 更新模板
 
 ```md

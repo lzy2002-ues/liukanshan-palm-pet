@@ -6,3 +6,6 @@ coverage/
 .env.*
 !.env.example
 .worktrees/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
