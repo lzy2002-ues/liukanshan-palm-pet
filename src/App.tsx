@@ -211,7 +211,6 @@ export default function App() {
           <div className="envelope" aria-hidden="true">♥</div>
           <p className="eyebrow">送给{state.encounter?.peer_author?.display_name ?? "对方"}</p>
           <h1>你的助力已送出</h1>
-          <p>一份小小的心意，正在送往对方的来信。</p>
         </section>
       )}
 

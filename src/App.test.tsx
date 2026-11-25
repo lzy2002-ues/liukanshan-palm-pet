@@ -65,6 +65,7 @@ describe("摇一摇掌机 Mock", () => {
     fireEvent.pointerUp(supportButton);
 
     await waitFor(() => expect(screen.getByText("你的助力已送出" )).toBeInTheDocument());
+    expect(screen.queryByText("一份小小的心意，正在送往对方的来信。")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "关闭，返回首页" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "回到首页" })).not.toBeInTheDocument();
     expect(screen.queryByText("一封新的来信")).not.toBeInTheDocument();
