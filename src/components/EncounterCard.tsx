@@ -45,7 +45,7 @@ export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPend
   return (
     <div className="encounter-card" data-content-type={encounter.content_type} data-source={encounter.source}>
       <div className="encounter-card__character">
-        {isPeer ? <FoxMark tone={avatarTone} size="large" /> : <FoxMark tone="snow" size="large" />}
+        {isPeer ? <FoxMark tone={avatarTone} avatarId={encounter.peer_author?.pet_avatar_id} size="large" /> : <FoxMark tone="snow" size="large" />}
       </div>
       <div className="encounter-card__speech">
         <strong>{isPeer ? `${encounter.peer_author?.display_name ?? "一位看山"}分享了` : "刘看山发现了"}</strong>

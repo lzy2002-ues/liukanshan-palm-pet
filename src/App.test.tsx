@@ -27,7 +27,8 @@ describe("摇一摇掌机 Mock", () => {
     expect(screen.getByText("正在听你说…")).toBeInTheDocument();
     fireEvent.pointerUp(screen.getByRole("button", { name: "松开，发送" }));
 
-    expect(screen.getByText("你：最近找工作有点焦虑。" )).toBeInTheDocument();
+    expect(screen.queryByText("你：最近找工作有点焦虑。")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("刘看山：我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument());
     expect(screen.getByRole("button", { name: "按住说话" })).toBeInTheDocument();
   });
 

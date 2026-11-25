@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 import { requestEncounter, sendSupport } from "./api/encounterApi";
 import type { PetAvatarId } from "./contracts";
@@ -8,8 +8,6 @@ import { EncounterCard } from "./components/EncounterCard";
 import { LetterScreen } from "./components/LetterScreen";
 import { createInitialDeviceState, deviceReducer } from "./state/deviceReducer";
 
-const formatTime = () => new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
-
 function avatarTone(id: PetAvatarId | null) {
   return avatarOptions.find((option) => option.id === id)?.tone ?? "snow";
 }
@@ -18,14 +16,13 @@ export default function App() {
   const [state, dispatch] = useReducer(deviceReducer, undefined, () => createInitialDeviceState());
   const [selectedAvatar, setSelectedAvatar] = useState<PetAvatarId>("liukanshan_03");
   const [isListening, setIsListening] = useState(false);
-  const [voicePhase, setVoicePhase] = useState<"idle" | "user" | "pet" | "action">("idle");
+  const [voicePhase, setVoicePhase] = useState<"idle" | "pet">("idle");
   const [phoneHint, setPhoneHint] = useState(false);
   const [supportPending, setSupportPending] = useState(false);
   const [supportError, setSupportError] = useState(false);
   const shakeInFlight = useRef(false);
   const supportInFlight = useRef(false);
   const matchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const displayTime = useMemo(formatTime, []);
   const voiceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const voiceRun = useRef(0);
 
@@ -59,16 +56,11 @@ export default function App() {
       showZhihuSuggestion: false,
     });
     const run = ++voiceRun.current;
-    setVoicePhase("user");
     voiceTimer.current = setTimeout(() => {
       if (run !== voiceRun.current) return;
       setVoicePhase("pet");
-      voiceTimer.current = setTimeout(() => {
-        if (run !== voiceRun.current) return;
-        setVoicePhase("action");
-        voiceTimer.current = setTimeout(() => { if (run === voiceRun.current) setVoicePhase("idle"); }, 5000);
-      }, 4500);
-    }, 2300);
+      voiceTimer.current = setTimeout(() => { if (run === voiceRun.current) setVoicePhase("idle"); }, 5000);
+    }, 450);
   };
 
   const shake = async () => {
@@ -136,11 +128,10 @@ export default function App() {
       {state.screen === "home" && (
         <section className="home-screen">
           <div className="home-snow">
-            <header className="status-line"><span>{displayTime}</span><span>● 已连接</span></header>
-            <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
+            <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} avatarId={state.petAvatarId} size="large" /></div>
             {!isListening && voicePhase === "idle" && <div className="home-greeting"><strong>刘看山</strong><span>我在这儿。想说什么，慢慢告诉我。</span></div>}
             {isListening && <div className="voice-overlay" role="status"><strong>正在听你说…</strong></div>}
-            {!isListening && voicePhase !== "idle" && <div className={`voice-bubble voice-bubble--${voicePhase}`} role="status">{voicePhase === "user" ? "你：最近找工作有点焦虑。" : "刘看山：我记住啦，想不想遇见有相似经历的小看山？"}</div>}
+            {!isListening && voicePhase !== "idle" && <div className="voice-bubble voice-bubble--pet" role="status">刘看山：我记住啦，想不想遇见有相似经历的小看山？</div>}
           </div>
           <div className="home-actions">
             <button
@@ -162,16 +153,16 @@ export default function App() {
       {state.screen === "matching" && (
         <section className="matching-screen matching-screen--meeting">
           <div className="meeting-foxes" aria-label="两只看山正在相遇">
-            <div className="meeting-fox meeting-fox--mine"><FoxMark tone="snow" size="normal" /></div>
+            <div className="meeting-fox meeting-fox--mine"><FoxMark tone="snow" avatarId={state.petAvatarId} size="normal" /></div>
             <span className="meeting-spark" aria-hidden="true">✧ · ✧</span>
-            <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" size="normal" /></div>
+            <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" avatarId="liukanshan_04" size="normal" /></div>
           </div>
         </section>
       )}
 
       {state.screen === "encounter" && state.encounter && (
         <section className="encounter-screen">
-          <header className="conversation-header"><span /><span>摇一摇奇遇</span><button aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button></header>
+          <button className="encounter-close" aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button>
           <EncounterCard encounter={state.encounter} isSupportPending={supportPending} onSupport={support} onOpenZhihu={() => setPhoneHint(true)} />
           {phoneHint && <p className="phone-hint">演示：手机端将展示相关知乎内容，当前未接真实链接。</p>}
           {supportError && <p className="phone-hint">这份心意暂时没能送达，请稍后再试。</p>}

@@ -42,8 +42,8 @@ type MessageType = "support_received" | "system";
 
 interface PublicPetProfile {
   anonymous_author_id: string; // 仅匿名池内部 ID，不能反推真实用户
-  display_name: string;        // 例如“远方的小看山”，不能包含真实昵称
-  pet_avatar_id: PetAvatarId;
+  display_name: string;        // 例如“小野看山”，展示用匿名昵称，不包含真实昵称
+  pet_avatar_id: PetAvatarId;  // 前端从六套本地资源映射图片
 }
 
 interface ZhihuContentMeta {
@@ -169,7 +169,7 @@ interface ZhihuContentMeta {
     ],
     "peer_author": {
       "anonymous_author_id": "anon_8f2b",
-      "display_name": "远方的小看山",
+      "display_name": "小野看山",
       "pet_avatar_id": "liukanshan_04"
     },
     "zhihu_content": null,
