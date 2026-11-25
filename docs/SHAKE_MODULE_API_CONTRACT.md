@@ -270,6 +270,7 @@ interface ZhihuContentMeta {
 - 不允许助力者与原作者建立聊天、关注或任何可识别身份关系。
 - 当 `delivery_status=queued` 时，设备只提示“你的助力已送出，审核后送达”，不能声称对方已经收到。成功页可展示 `peer_author.display_name`，不得展示 `anonymous_author_id`、真实用户 ID 或知乎账号 ID。
 - `content_type=peer_post` 的帖子属于产品匿名池，没有知乎帖子链接；该页面不展示“相关知乎经验”或“去知乎看这位用户的帖子”。只有 `zhihu_content.url` 非空且来源真实可用的知乎内容，才可引导用户在手机端打开知乎原文。
+- 设备上的情绪奇遇只把 `peer_author.display_name`、`title`、`summary` 组合成一条短气泡；不展示内部 ID，不再提供展开/收起。后端须给出适合小屏展示的简短摘要；完整匿名分享如未来需要在手机端查看，应新增产品自有详情路由，不能推测知乎主页或链接。
 
 ## 7. 原作者的来信
 

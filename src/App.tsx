@@ -160,14 +160,12 @@ export default function App() {
       )}
 
       {state.screen === "matching" && (
-        <section className="matching-screen">
+        <section className="matching-screen matching-screen--meeting">
           <div className="meeting-foxes" aria-label="两只看山正在相遇">
-            <div className="meeting-fox meeting-fox--mine"><FoxMark tone={avatarTone(state.petAvatarId)} size="normal" /><small>我的看山</small></div>
+            <div className="meeting-fox meeting-fox--mine"><FoxMark tone="snow" size="normal" /></div>
             <span className="meeting-spark" aria-hidden="true">✧ · ✧</span>
-            <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" size="normal" /><small>远方的小看山</small></div>
+            <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" size="normal" /></div>
           </div>
-          <h1>正在遇见…</h1>
-          <p>刘看山正在替你翻一翻世界。</p>
         </section>
       )}
 
@@ -193,9 +191,9 @@ export default function App() {
         <section className="support-result-screen">
           <button className="support-result-close" aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button>
           <div className="envelope" aria-hidden="true">♥</div>
-          <p className="eyebrow">送给{state.encounter?.peer_author?.display_name ?? "远方的小看山"}</p>
+          <p className="eyebrow">送给{state.encounter?.peer_author?.display_name ?? "对方"}</p>
           <h1>你的助力已送出</h1>
-          <p>通过审核后，会成为对方的一封刘看山来信。</p>
+          <p>一份小小的心意，正在送往对方的来信。</p>
         </section>
       )}
 

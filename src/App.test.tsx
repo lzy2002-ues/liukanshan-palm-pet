@@ -40,9 +40,10 @@ describe("摇一摇掌机 Mock", () => {
     await user.click(screen.getByRole("button", { name: "模拟摇动设备" }));
 
     expect(screen.getByLabelText("两只看山正在相遇")).toBeInTheDocument();
+    expect(screen.queryByText("远方的小看山")).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByText("找工作时总觉得自己不够好，怎么办？")).toBeInTheDocument(), { timeout: 3500 });
-    await user.click(screen.getByRole("button", { name: "展开看看 ↓" }));
-    expect(screen.getByText("仅展示对方确认公开的匿名内容")).toBeInTheDocument();
+    expect(screen.getByText("小野看山分享了")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /展开|收起/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /知乎/ })).not.toBeInTheDocument();
     expect(screen.queryByText("anon_8f2b")).not.toBeInTheDocument();
     const supportButton = screen.getByRole("button", { name: "按住助力" });

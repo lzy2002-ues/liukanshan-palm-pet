@@ -19,12 +19,10 @@ const toneByAvatar: Record<string, string> = {
 };
 
 export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPending }: EncounterCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (holdTimer.current) clearTimeout(holdTimer.current); }, []);
   const isPeer = encounter.content_type === "peer_post";
-  const sourceLabel = encounter.source === "demo" ? "演示内容 · 知乎经验" : isPeer ? "匿名奇遇" : "知乎经验";
   const avatarTone = encounter.peer_author
     ? toneByAvatar[encounter.peer_author.pet_avatar_id] ?? "snow"
     : "blue";
@@ -45,23 +43,15 @@ export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPend
   };
 
   return (
-    <div className={`encounter-card ${expanded ? "is-expanded" : ""}`} data-content-type={encounter.content_type} data-source={encounter.source}>
-      <div className="encounter-card__topline">
-        <span className={`source-pill ${isPeer ? "source-pill--warm" : ""}`}>
-          {sourceLabel}
-        </span>
-        <span className="source-pill source-pill--quiet">{encounter.match_mode === "contextual" ? "刚才的你" : "随机遇见"}</span>
-      </div>
+    <div className="encounter-card" data-content-type={encounter.content_type} data-source={encounter.source}>
       <div className="encounter-card__character">
-        {isPeer ? <FoxMark tone={avatarTone} size="large" /> : <span className="zhihu-mark">知</span>}
-        <p className="encounter-card__author">{encounter.peer_author?.display_name ?? encounter.zhihu_content?.author_name ?? "知乎内容"}</p>
+        {isPeer ? <FoxMark tone={avatarTone} size="large" /> : <FoxMark tone="snow" size="large" />}
       </div>
       <div className="encounter-card__speech">
+        <strong>{isPeer ? `${encounter.peer_author?.display_name ?? "一位看山"}分享了` : "刘看山发现了"}</strong>
         <h2>{encounter.title}</h2>
         <p className="encounter-card__summary">{encounter.summary}</p>
       </div>
-      <button className="expand-action" aria-expanded={expanded} onClick={() => setExpanded(!expanded)} type="button">{expanded ? "收起内容 ↑" : "展开看看 ↓"}</button>
-      {expanded && <div className="encounter-card__detail"><p>{encounter.match_reason}</p><small>{isPeer ? "仅展示对方确认公开的匿名内容" : "完整内容请前往知乎查看"}</small></div>}
       {encounter.can_support ? (
         <div className="encounter-actions">
           <button
@@ -81,7 +71,7 @@ export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPend
           </button>
         </div>
       ) : (
-        <button className="outline-action" onClick={onOpenZhihu} type="button">{encounter.source === "demo" ? "演示：前往知乎查看" : "前往知乎查看 ↗"}</button>
+        <button className="encounter-zhihu-action" onClick={onOpenZhihu} type="button">{encounter.source === "demo" ? "演示：前往知乎查看" : "前往知乎查看 ↗"}</button>
       )}
     </div>
   );

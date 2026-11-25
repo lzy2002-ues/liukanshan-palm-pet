@@ -27,7 +27,7 @@ const peerEncounter: Encounter = {
   ],
   peer_author: {
     anonymous_author_id: "anon_8f2b",
-    display_name: "远方的小看山",
+    display_name: "小野看山",
     pet_avatar_id: "liukanshan_04",
   },
   zhihu_content: null,
