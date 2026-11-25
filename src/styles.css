@@ -118,9 +118,13 @@ button { font: inherit; cursor: pointer; }
 .encounter-card__detail { border-top: 1px solid #d5e4e7; color: #516c75; font-size: 11px; line-height: 1.5; }
 .encounter-card__detail p { margin: 7px 0; }.encounter-card__detail small { color: #84979c; }
 .encounter-actions { display: grid; gap: 7px; }
-.support-hold { position: relative; overflow: hidden; height: 38px; border: 0; border-radius: 7px; background: #536f7c; color: white; font-size: 12px; font-weight: 700; touch-action: none; }
-.support-hold.is-holding::before { content: ""; position: absolute; inset: 0; transform-origin: left; background: #85c2b5aa; animation: hold-fill .7s linear forwards; }
-.support-hold.is-holding { isolation: isolate; }
+.support-hold { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 9px; height: 42px; border: 0; border-radius: 10px; background: #536f7c; color: white; font-size: 12px; font-weight: 700; touch-action: none; }
+.support-hold__fill { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: #82b9af; }
+.support-hold.is-holding .support-hold__fill { animation: hold-fill .7s linear forwards; }
+.support-hold__heart, .support-hold__copy { position: relative; z-index: 1; }
+.support-hold__heart { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #ffffff2e; color: #ffe4dc; font-size: 15px; }
+.support-hold.is-holding .support-hold__heart { animation: heart-beat .35s ease-in-out infinite alternate; }
+@keyframes heart-beat { to { transform: scale(1.18); } }
 @keyframes hold-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .zhihu-guide { border: 0; background: transparent; color: #536f7c; font-size: 11px; padding: 4px; }
 

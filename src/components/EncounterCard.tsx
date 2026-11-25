@@ -74,7 +74,11 @@ export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPend
             onKeyDown={(event) => { if (!event.repeat && (event.key === " " || event.key === "Enter")) { event.preventDefault(); beginHold(); } }}
             onKeyUp={(event) => { if (event.key === " " || event.key === "Enter") { event.preventDefault(); cancelHold(); } }}
             type="button"
-          >{isSupportPending ? "正在送出…" : "长按助力"}</button>
+          >
+            <span className="support-hold__fill" aria-hidden="true" />
+            <span className="support-hold__heart" aria-hidden="true">♥</span>
+            <span className="support-hold__copy">{isSupportPending ? "小心意正在送出…" : isHolding ? "抱抱正在送达…" : "按住送个抱抱"}</span>
+          </button>
           <button className="zhihu-guide" onClick={onOpenPhone} type="button">看看相关知乎经验 ↗</button>
         </div>
       ) : (

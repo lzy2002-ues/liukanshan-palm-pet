@@ -39,6 +39,11 @@
 | 知乎搜索 | `GET /api/v1/content/zhihu_search` | 服务端以 `Query`、`Count` 和可选 `SortBy` 搜索站内内容。可返回内容 ID、类型、标题、摘要、链接、作者和互动指标。 |
 | 知乎热榜 | `GET /api/v1/content/hot_list` | 服务端以 `Limit` 获取热点。仅保证标题、链接、缩略图、摘要，不保证作者和互动指标。 |
 | 直答 | `POST /v1/chat/completions` | 仅保证 `model`、`messages`、`stream`。可用于从已脱敏主题摘要提炼检索词；输出不应假定为严格 JSON，必须服务端校验。 |
+| 用户近期收藏 | `GET /api/v1/user/collections` | 只读取公开范围内的近期收藏；查询其他用户需其知乎 OAuth 授权并由服务端传 `X-OAuth-Token`。不提供写入能力。 |
+| 用户收藏夹 | `GET /api/v1/user/favlists` | 只读取公开范围内的收藏夹列表及 `UrlToken`；查询其他用户同样需要 OAuth 授权。 |
+| 收藏夹内容 | `GET /api/v1/user/favlist_contents` | 用 `FavlistUrlToken` 读取指定收藏夹公开内容，支持 `Offset` / `Limit` 分页；查询其他用户同样需要 OAuth 授权。 |
 
 - 三类能力均使用服务端 Bearer Access Secret 和秒级 `X-Request-Timestamp`；任何密钥不得到前端或硬件。
+- 上述三个收藏接口也需要服务端 Bearer Access Secret 和秒级 `X-Request-Timestamp`。不传 OAuth token 时文档所称“本人”是当前调用方，不能当作任意 App 用户。授权用户凭证仅由服务端持有。
+- 目前提供的收藏文档均为只读 `GET`，没有确认的收藏写入接口。摇到知乎内容后可以由产品自有后端保存“稍后看”记录，并让用户打开知乎自行收藏；界面不可写“已同步到知乎收藏”。
 - 摇一摇产品 API 的标准化字段、回退和标识规则见 [`docs/SHAKE_MODULE_API_CONTRACT.md`](SHAKE_MODULE_API_CONTRACT.md)。

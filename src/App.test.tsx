@@ -43,7 +43,7 @@ describe("摇一摇掌机 Mock", () => {
     await waitFor(() => expect(screen.getByText("找工作时总觉得自己不够好，怎么办？")).toBeInTheDocument(), { timeout: 3500 });
     await user.click(screen.getByRole("button", { name: "展开看看 ↓" }));
     expect(screen.getByText("仅展示对方确认公开的匿名内容")).toBeInTheDocument();
-    const supportButton = screen.getByRole("button", { name: "长按助力" });
+    const supportButton = screen.getByRole("button", { name: "按住送个抱抱" });
     fireEvent.pointerDown(supportButton);
     await new Promise((resolve) => setTimeout(resolve, 750));
     fireEvent.pointerUp(supportButton);
