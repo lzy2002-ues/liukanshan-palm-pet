@@ -99,6 +99,13 @@
 - 验证：先更新测试并确认旧实现失败；修正后 `npm test -- --run` 通过（13 项），`npm run build`、`git diff --check` 通过；浏览器核对无转写时上方没有气泡框。
 - 待办：Figma 画板尚未同步。
 
+### 2026-11-25 — 摇一摇前端交接
+
+- 完成：新增 `docs/SHAKE_UI_HANDOFF.md`，列出队友读取顺序、可运行命令、模块文件所有权、首页合并边界、ESP32/后端接口，以及可直接交给队友 Codex 的指令；修正 README 对无转写气泡的描述。
+- 决定：以 `codex/shake-ui` 分支交付 React 浏览器 Mock。正式首页由首页同学保留并接入对话/奇遇状态；不能直接拿演示版 `src/App.tsx` 覆盖正式首页。
+- 验证：`npm test -- --run` 通过（13 项），`npm run build` 通过，`git diff --check` 通过。
+- 待办：把分支推送至团队 GitHub 后交给首页同学合并；真实服务和硬件联调仍待开展。
+
 ```md
 ### YYYY-MM-DD — 工作主题
 
