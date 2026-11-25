@@ -34,18 +34,16 @@ export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPend
         </span>
         <span className="source-pill source-pill--quiet">{encounter.match_mode === "contextual" ? "刚才的你" : "随机遇见"}</span>
       </div>
-      <div className="encounter-card__body">
-        {isPeer ? <FoxMark tone={avatarTone} size="small" /> : <span className="zhihu-mark">知</span>}
-        <div>
-          <p className="encounter-card__author">
-            {encounter.peer_author?.display_name ?? encounter.zhihu_content?.author_name ?? "知乎内容"}
-          </p>
-          <h2>{encounter.title}</h2>
-        </div>
+      <div className="encounter-card__character">
+        {isPeer ? <FoxMark tone={avatarTone} size="large" /> : <span className="zhihu-mark">知</span>}
+        <p className="encounter-card__author">{encounter.peer_author?.display_name ?? encounter.zhihu_content?.author_name ?? "知乎内容"}</p>
       </div>
-      <p className="encounter-card__summary">{encounter.summary}</p>
+      <div className="encounter-card__speech">
+        <h2>{encounter.title}</h2>
+        <p className="encounter-card__summary">{encounter.summary}</p>
+      </div>
       <button className="expand-action" aria-expanded={expanded} onClick={() => setExpanded(!expanded)} type="button">{expanded ? "收起内容 ↑" : "展开看看 ↓"}</button>
-      {expanded && <div className="encounter-card__detail"><p>{encounter.summary}</p><p>{encounter.match_reason}</p><small>{isPeer ? "仅展示对方确认公开的匿名内容" : "完整内容请前往知乎查看"}</small></div>}
+      {expanded && <div className="encounter-card__detail"><p>{encounter.match_reason}</p><small>{isPeer ? "仅展示对方确认公开的匿名内容" : "完整内容请前往知乎查看"}</small></div>}
       {encounter.can_support ? (
         <div className="support-row">
           {encounter.support_options.map((option) => (

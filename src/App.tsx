@@ -24,11 +24,15 @@ export default function App() {
   const [supportError, setSupportError] = useState(false);
   const shakeInFlight = useRef(false);
   const supportInFlight = useRef(false);
+  const matchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const displayTime = useMemo(formatTime, []);
   const voiceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const voiceRun = useRef(0);
 
-  useEffect(() => () => { if (voiceTimer.current) clearTimeout(voiceTimer.current); }, []);
+  useEffect(() => () => {
+    if (voiceTimer.current) clearTimeout(voiceTimer.current);
+    if (matchTimer.current) clearTimeout(matchTimer.current);
+  }, []);
 
   const clearVoice = () => {
     voiceRun.current += 1;
@@ -80,12 +84,12 @@ export default function App() {
         trigger_source: "mock",
         client_triggered_at: new Date().toISOString(),
       });
-      dispatch({ type: "encounter_received", encounter: response.data });
+      matchTimer.current = setTimeout(() => dispatch({ type: "encounter_received", encounter: response.data }), 1800);
     } catch {
-      dispatch({
+      matchTimer.current = setTimeout(() => dispatch({
         type: "encounter_received",
         encounter: { status: "empty", encounter_id: null, empty_reason: "no_eligible_content", retry_after_seconds: 30 },
-      });
+      }), 1800);
     } finally {
       shakeInFlight.current = false;
     }
@@ -111,7 +115,7 @@ export default function App() {
   };
 
   return (
-    <DeviceShell label="刘看山掌机交互演示">
+    <DeviceShell label="刘看山掌机交互演示" onSimulateShake={shake} showSimulator={state.screen === "home"}>
       {state.screen === "avatar_picker" && (
         <section className="onboarding-screen">
           <span className="step-label">第一次见面</span>
@@ -137,39 +141,21 @@ export default function App() {
           </div>
           <p className="eyebrow">刘看山在这儿</p>
           <h1>今天也陪着你</h1>
-          {voicePhase === "action" ? <button className="inline-action" onClick={shake} type="button">去摇一摇 · 遇见共鸣</button> : <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>}
+          {voicePhase === "action" ? <p className="home-copy">想遇见相似经历？轻轻摇动掌机。</p> : <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>}
           <div className="home-actions">
             <button className={isListening ? "recording-action" : "ghost-action"} onClick={isListening ? finishTalking : startTalking} type="button">{isListening ? "松开，发送" : "按住说话"}</button>
-            <button className="primary-action" onClick={shake} type="button">摇一摇遇见</button>
           </div>
           {state.unreadLetters > 0 && <button className="letter-dot" onClick={() => dispatch({ type: "open_letter" })} type="button">✉ {state.unreadLetters} 封来信</button>}
         </section>
       )}
 
-      {state.screen === "conversation" && (
-        <section className="conversation-screen">
-          <header className="conversation-header"><button onClick={() => dispatch({ type: "go_home" })} type="button">‹</button><span>{isListening ? "刘看山在听" : "刘看山陪你聊"}</span><span className="connection-dot">●</span></header>
-          <div className="conversation-list">
-            {state.conversation.map((bubble) => <p key={bubble.id} className={`bubble bubble--${bubble.role}`}>{bubble.text}</p>)}
-            {state.showZhihuSuggestion && (
-              <article className="mini-zhihu-card">
-                <span>知乎经验</span>
-                <strong>求职低谷期，如何恢复节奏？</strong>
-                <button onClick={() => setPhoneHint(true)} type="button">去手机看详情</button>
-              </article>
-            )}
-            {phoneHint && <p className="phone-hint">已为手机端准备详情入口</p>}
-          </div>
-          <div className="conversation-actions">
-            {isListening ? <button aria-label="松开发送" className="recording-action" onClick={finishTalking} type="button">● 松开发送</button> : <button className="ghost-action" onClick={startTalking} type="button">按住继续说</button>}
-            <button className="primary-action" onClick={shake} type="button">摇一摇</button>
-          </div>
-        </section>
-      )}
-
       {state.screen === "matching" && (
         <section className="matching-screen">
-          <div className="meeting-foxes" aria-label="两只看山正在相遇"><FoxMark tone={avatarTone(state.petAvatarId)} size="normal" /><span>✧ · ✧</span><FoxMark tone="violet" size="normal" /></div>
+          <div className="meeting-foxes" aria-label="两只看山正在相遇">
+            <div className="meeting-fox meeting-fox--mine"><FoxMark tone={avatarTone(state.petAvatarId)} size="normal" /><small>我的看山</small></div>
+            <span className="meeting-spark" aria-hidden="true">✧ · ✧</span>
+            <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" size="normal" /><small>远方的小看山</small></div>
+          </div>
           <h1>正在遇见…</h1>
           <p>刘看山正在替你翻一翻世界。</p>
         </section>
