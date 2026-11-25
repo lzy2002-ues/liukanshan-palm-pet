@@ -55,6 +55,11 @@ describe("deviceReducer", () => {
     expect(state.petAvatarId).toBe("liukanshan_03");
   });
 
+  it("enters the conversation screen from home", () => {
+    const state = deviceReducer(createInitialDeviceState("liukanshan_03"), { type: "open_conversation" });
+    expect(state.screen).toBe("conversation");
+  });
+
   it("locks repeated shakes while an encounter is matching", () => {
     const matching = deviceReducer(createInitialDeviceState("liukanshan_01"), {
       type: "shake_started",

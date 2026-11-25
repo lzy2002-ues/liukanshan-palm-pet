@@ -27,6 +27,7 @@ export interface DeviceState {
 
 export type DeviceAction =
   | { type: "avatar_confirmed"; petAvatarId: PetAvatarId }
+  | { type: "open_conversation" }
   | { type: "talk_started" }
   | { type: "conversation_updated"; bubbles: ConversationBubble[]; showZhihuSuggestion: boolean }
   | { type: "shake_started" }
@@ -54,12 +55,14 @@ export function deviceReducer(state: DeviceState, action: DeviceAction): DeviceS
   switch (action.type) {
     case "avatar_confirmed":
       return { ...state, petAvatarId: action.petAvatarId, screen: "home" };
+    case "open_conversation":
+      return { ...state, screen: "conversation" };
     case "talk_started":
-      return { ...state, screen: "home" };
+      return { ...state, screen: "conversation" };
     case "conversation_updated":
       return {
         ...state,
-        screen: "home",
+        screen: "conversation",
         conversation: action.bubbles,
         showZhihuSuggestion: action.showZhihuSuggestion,
       };

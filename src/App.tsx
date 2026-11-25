@@ -8,6 +8,12 @@ import { EncounterCard } from "./components/EncounterCard";
 import { LetterScreen } from "./components/LetterScreen";
 import { createInitialDeviceState, deviceReducer } from "./state/deviceReducer";
 
+const mockTranscript = "最近找工作有点焦虑，投了几次简历都没有回音，明明已经准备了很久，还是担心自己不够好。";
+const mockReplies = [
+  "我记住啦，想不想遇见有相似经历的小看山？",
+  "听起来这段时间很不容易。我在这儿，陪你慢慢整理。",
+];
+
 function avatarTone(id: PetAvatarId | null) {
   return avatarOptions.find((option) => option.id === id)?.tone ?? "snow";
 }
@@ -16,29 +22,34 @@ export default function App() {
   const [state, dispatch] = useReducer(deviceReducer, undefined, () => createInitialDeviceState());
   const [selectedAvatar, setSelectedAvatar] = useState<PetAvatarId>("liukanshan_03");
   const [isListening, setIsListening] = useState(false);
-  const [voicePhase, setVoicePhase] = useState<"idle" | "pet">("idle");
+  const [userPreview, setUserPreview] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("我在这儿，慢慢说。");
   const [phoneHint, setPhoneHint] = useState(false);
   const [supportPending, setSupportPending] = useState(false);
   const [supportError, setSupportError] = useState(false);
   const shakeInFlight = useRef(false);
   const supportInFlight = useRef(false);
   const matchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const voiceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const replyIndex = useRef(0);
   const voiceRun = useRef(0);
 
   useEffect(() => () => {
-    if (voiceTimer.current) clearTimeout(voiceTimer.current);
+    if (replyTimer.current) clearTimeout(replyTimer.current);
+    if (previewTimer.current) clearTimeout(previewTimer.current);
     if (matchTimer.current) clearTimeout(matchTimer.current);
   }, []);
 
   const clearVoice = () => {
     voiceRun.current += 1;
-    if (voiceTimer.current) clearTimeout(voiceTimer.current);
-    setVoicePhase("idle");
+    if (replyTimer.current) clearTimeout(replyTimer.current);
+    if (previewTimer.current) clearTimeout(previewTimer.current);
   };
 
   const startTalking = () => {
     clearVoice();
+    setUserPreview(null);
     setIsListening(true);
     dispatch({ type: "talk_started" });
   };
@@ -46,21 +57,25 @@ export default function App() {
   const finishTalking = () => {
     if (!isListening) return;
     setIsListening(false);
+    setUserPreview(mockTranscript);
     dispatch({
       type: "conversation_updated",
       bubbles: [
         { id: "pet-welcome", role: "pet", text: "我在呢，慢慢说也没关系。" },
-        { id: "user-job", role: "user", text: "最近找工作有点焦虑。" },
+        { id: "user-job", role: "user", text: mockTranscript },
         { id: "pet-answer", role: "pet", text: "听起来你扛了很多，我陪你慢一点整理。" },
       ],
       showZhihuSuggestion: false,
     });
     const run = ++voiceRun.current;
-    voiceTimer.current = setTimeout(() => {
+    previewTimer.current = setTimeout(() => {
+      if (run === voiceRun.current) setUserPreview(null);
+    }, 4500);
+    replyTimer.current = setTimeout(() => {
       if (run !== voiceRun.current) return;
-      setVoicePhase("pet");
-      voiceTimer.current = setTimeout(() => { if (run === voiceRun.current) setVoicePhase("idle"); }, 5000);
-    }, 450);
+      setReplyText(mockReplies[replyIndex.current % mockReplies.length]);
+      replyIndex.current += 1;
+    }, 650);
   };
 
   const shake = async () => {
@@ -108,7 +123,7 @@ export default function App() {
   };
 
   return (
-    <DeviceShell label="刘看山掌机交互演示" onSimulateShake={shake} showSimulator={state.screen === "home"}>
+    <DeviceShell label="刘看山掌机交互演示" onSimulateShake={shake} showSimulator={state.screen === "home" || state.screen === "conversation"}>
       {state.screen === "avatar_picker" && (
         <section className="onboarding-screen">
           <span className="step-label">第一次见面</span>
@@ -129,9 +144,22 @@ export default function App() {
         <section className="home-screen">
           <div className="home-snow">
             <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} avatarId={state.petAvatarId} size="large" /></div>
-            {!isListening && voicePhase === "idle" && <div className="home-greeting"><strong>刘看山</strong><span>我在这儿。想说什么，慢慢告诉我。</span></div>}
+            <div className="home-greeting"><strong>刘看山</strong><span>我在这儿。想说什么，慢慢告诉我。</span></div>
+          </div>
+          <div className="home-actions">
+            <button className="primary-action" onClick={() => dispatch({ type: "open_conversation" })} type="button">进入对话</button>
+          </div>
+          {state.unreadLetters > 0 && <button className="letter-dot" onClick={() => dispatch({ type: "open_letter" })} type="button">✉ {state.unreadLetters} 封来信</button>}
+        </section>
+      )}
+
+      {state.screen === "conversation" && (
+        <section className="conversation-screen">
+          <div className="home-snow">
+            <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} avatarId={state.petAvatarId} size="large" /></div>
+            <div className="user-preview" aria-label="本轮说话预览">{userPreview && <><span className="user-preview__label">你：</span><span className="user-preview__text">{userPreview}</span></>}</div>
             {isListening && <div className="voice-overlay" role="status"><strong>正在听你说…</strong></div>}
-            {!isListening && voicePhase !== "idle" && <div className="voice-bubble voice-bubble--pet" role="status">刘看山：我记住啦，想不想遇见有相似经历的小看山？</div>}
+            <div className="home-greeting" role="status"><strong>刘看山</strong><span>{replyText}</span></div>
           </div>
           <div className="home-actions">
             <button
@@ -146,7 +174,6 @@ export default function App() {
               {isListening ? <><span className="button-wave" aria-hidden="true"><i /><i /><i /><i /><i /><i /></span>松开，发送</> : "按住说话"}
             </button>
           </div>
-          {state.unreadLetters > 0 && <button className="letter-dot" onClick={() => dispatch({ type: "open_letter" })} type="button">✉ {state.unreadLetters} 封来信</button>}
         </section>
       )}
 

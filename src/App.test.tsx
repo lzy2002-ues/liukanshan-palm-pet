@@ -13,24 +13,36 @@ describe("摇一摇掌机 Mock", () => {
     await user.click(screen.getByRole("button", { name: "我选好了" }));
 
     expect(screen.getByText("我在这儿。想说什么，慢慢告诉我。")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "进入对话" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "按住说话" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "摇一摇遇见" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "模拟摇动设备" })).toBeInTheDocument();
   });
 
-  it("shows listening feedback and a brief bubble on the home screen", async () => {
+  it("opens conversation and keeps one clipped user preview above the reply", async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: "选中 北极蓝" }));
     await user.click(screen.getByRole("button", { name: "我选好了" }));
+    await user.click(screen.getByRole("button", { name: "进入对话" }));
+    expect(screen.getByLabelText("本轮说话预览")).toBeEmptyDOMElement();
+    expect(screen.queryByRole("button", { name: "返回首页" })).not.toBeInTheDocument();
     fireEvent.pointerDown(screen.getByRole("button", { name: "按住说话" }));
     expect(screen.getByText("正在听你说…")).toBeInTheDocument();
     fireEvent.pointerUp(screen.getByRole("button", { name: "松开，发送" }));
 
-    expect(screen.queryByText("你：最近找工作有点焦虑。")).not.toBeInTheDocument();
-    await waitFor(() => expect(screen.getByText("刘看山：我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument());
+    const preview = screen.getByLabelText("本轮说话预览");
+    expect(preview).toHaveClass("user-preview");
+    expect(preview).toHaveTextContent("最近找工作有点焦虑，投了几次简历都没有回音");
+    await waitFor(() => expect(screen.getByText("我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument());
+    await waitFor(() => expect(preview).toBeEmptyDOMElement(), { timeout: 6000 });
+    expect(screen.getByText("我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument();
+    fireEvent.pointerDown(screen.getByRole("button", { name: "按住说话" }));
+    fireEvent.pointerUp(screen.getByRole("button", { name: "松开，发送" }));
+    await waitFor(() => expect(screen.getByText("听起来这段时间很不容易。我在这儿，陪你慢慢整理。")).toBeInTheDocument());
     expect(screen.getByRole("button", { name: "按住说话" })).toBeInTheDocument();
-  });
+  }, 10000);
 
   it("confirms sent support without showing the sender a received letter", async () => {
     const user = userEvent.setup();

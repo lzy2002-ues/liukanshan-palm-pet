@@ -78,7 +78,10 @@ button { font: inherit; cursor: pointer; }
 .home-actions { display: grid; grid-template-columns: 1fr; width: 100%; gap: 10px; margin-top: 14px; }
 .letter-dot { border: 0; background: #fff7ed; color: #a4653f; border-radius: 99px; padding: 7px 11px; margin-top: 11px; font-size: 11px; }
 
-.conversation-screen { height: 100%; display: flex; flex-direction: column; padding: 13px; }
+.conversation-screen { height: 100%; display: flex; flex-direction: column; align-items: center; padding: 22px 24px 16px; position: relative; }
+.user-preview { position: absolute; z-index: 2; top: 43px; right: 16px; width: 195px; height: 51px; padding: 8px 10px; overflow: hidden; display: flex; align-items: flex-start; border: 1px solid #b0bed0; border-radius: 9px; background: #fff; box-shadow: 0 3px 9px #617d851a; color: #536a78; font-size: 11px; line-height: 1.5; text-align: left; }
+.user-preview__label { flex: none; font-weight: 700; }
+.user-preview__text { min-width: 0; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .encounter-screen { position: relative; width: 100%; height: 100%; padding: 22px 24px 16px; display: flex; flex-direction: column; background: #f8fafd; }
 .conversation-header { min-height: 28px; display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; text-align: center; color: #45646d; font-size: 12px; font-weight: 700; }
 .conversation-header button { border: 0; background: transparent; color: #52747c; font-size: 26px; line-height: 1; }
