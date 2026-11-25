@@ -26,7 +26,7 @@ describe("摇一摇掌机 Mock", () => {
     await user.click(screen.getByRole("button", { name: "选中 北极蓝" }));
     await user.click(screen.getByRole("button", { name: "我选好了" }));
     await user.click(screen.getByRole("button", { name: "进入对话" }));
-    expect(screen.getByLabelText("本轮说话预览")).toBeEmptyDOMElement();
+    expect(screen.queryByLabelText("本轮说话预览")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "返回首页" })).not.toBeInTheDocument();
     fireEvent.pointerDown(screen.getByRole("button", { name: "按住说话" }));
     expect(screen.getByText("正在听你说…")).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("摇一摇掌机 Mock", () => {
     expect(preview).toHaveClass("user-preview");
     expect(preview).toHaveTextContent("最近找工作有点焦虑，投了几次简历都没有回音");
     await waitFor(() => expect(screen.getByText("我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument());
-    await waitFor(() => expect(preview).toBeEmptyDOMElement(), { timeout: 6000 });
+    await waitFor(() => expect(screen.queryByLabelText("本轮说话预览")).not.toBeInTheDocument(), { timeout: 6000 });
     expect(screen.getByText("我记住啦，想不想遇见有相似经历的小看山？")).toBeInTheDocument();
     fireEvent.pointerDown(screen.getByRole("button", { name: "按住说话" }));
     fireEvent.pointerUp(screen.getByRole("button", { name: "松开，发送" }));

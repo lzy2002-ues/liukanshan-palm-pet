@@ -157,7 +157,7 @@ export default function App() {
         <section className="conversation-screen">
           <div className="home-snow">
             <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} avatarId={state.petAvatarId} size="large" /></div>
-            <div className="user-preview" aria-label="本轮说话预览">{userPreview && <><span className="user-preview__label">你：</span><span className="user-preview__text">{userPreview}</span></>}</div>
+            {userPreview && <div className="user-preview" aria-label="本轮说话预览"><span className="user-preview__label">你：</span><span className="user-preview__text">{userPreview}</span></div>}
             {isListening && <div className="voice-overlay" role="status"><strong>正在听你说…</strong></div>}
             <div className="home-greeting" role="status"><strong>刘看山</strong><span>{replyText}</span></div>
           </div>
