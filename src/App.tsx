@@ -30,6 +30,7 @@ export default function App() {
   const shakeInFlight = useRef(false);
   const supportInFlight = useRef(false);
   const matchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const replyIndex = useRef(0);
@@ -39,6 +40,7 @@ export default function App() {
     if (replyTimer.current) clearTimeout(replyTimer.current);
     if (previewTimer.current) clearTimeout(previewTimer.current);
     if (matchTimer.current) clearTimeout(matchTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
   }, []);
 
   const clearVoice = () => {
@@ -91,7 +93,12 @@ export default function App() {
         trigger_source: "mock",
         client_triggered_at: new Date().toISOString(),
       });
-      matchTimer.current = setTimeout(() => dispatch({ type: "encounter_received", encounter: response.data }), 1800);
+      matchTimer.current = setTimeout(() => {
+        dispatch({ type: "encounter_received", encounter: response.data });
+        if (response.data.status === "matched" && response.data.content_type === "peer_post") {
+          revealTimer.current = setTimeout(() => dispatch({ type: "reveal_finished" }), 1600);
+        }
+      }, 1800);
     } catch {
       matchTimer.current = setTimeout(() => dispatch({
         type: "encounter_received",
@@ -183,6 +190,16 @@ export default function App() {
             <div className="meeting-fox meeting-fox--mine"><FoxMark tone="snow" avatarId={state.petAvatarId} size="normal" /></div>
             <span className="meeting-spark" aria-hidden="true">✧ · ✧</span>
             <div className="meeting-fox meeting-fox--peer"><FoxMark tone="violet" avatarId="liukanshan_04" size="normal" /></div>
+          </div>
+        </section>
+      )}
+
+      {state.screen === "peer_reveal" && state.encounter && (
+        <section className="peer-reveal-screen">
+          <button className="encounter-close" aria-label="关闭，返回首页" onClick={() => { if (revealTimer.current) clearTimeout(revealTimer.current); dispatch({ type: "go_home" }); }} type="button">×</button>
+          <div className="peer-reveal-scene">
+            <FoxMark tone={avatarTone(state.encounter.peer_author?.pet_avatar_id ?? null)} avatarId={state.encounter.peer_author?.pet_avatar_id} size="large" />
+            <p>匹配到{state.encounter.peer_author?.display_name ?? "一位看山"}</p>
           </div>
         </section>
       )}

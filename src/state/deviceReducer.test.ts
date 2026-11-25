@@ -70,14 +70,15 @@ describe("deviceReducer", () => {
     expect(repeated).toEqual(matching);
   });
 
-  it("shows supportable peer content as an encounter", () => {
+  it("reveals a matched peer before showing their post", () => {
     const state = deviceReducer(createInitialDeviceState("liukanshan_01"), {
       type: "encounter_received",
       encounter: peerEncounter,
     });
 
-    expect(state.screen).toBe("encounter");
+    expect(state.screen).toBe("peer_reveal");
     expect(state.encounter?.can_support).toBe(true);
+    expect(deviceReducer(state, { type: "reveal_finished" }).screen).toBe("encounter");
   });
 
   it("shows a Zhihu encounter without creating support options", () => {
@@ -96,7 +97,8 @@ describe("deviceReducer", () => {
       type: "encounter_received",
       encounter: peerEncounter,
     });
-    const sentState = deviceReducer(encounterState, { type: "support_delivered" });
+    const revealedState = deviceReducer(encounterState, { type: "reveal_finished" });
+    const sentState = deviceReducer(revealedState, { type: "support_delivered" });
 
     expect(sentState.screen).toBe("support_sent");
     expect(sentState.unreadLetters).toBe(0);

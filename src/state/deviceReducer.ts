@@ -5,6 +5,7 @@ export type DeviceScreen =
   | "home"
   | "conversation"
   | "matching"
+  | "peer_reveal"
   | "encounter"
   | "empty"
   | "support_sent"
@@ -32,6 +33,7 @@ export type DeviceAction =
   | { type: "conversation_updated"; bubbles: ConversationBubble[]; showZhihuSuggestion: boolean }
   | { type: "shake_started" }
   | { type: "encounter_received"; encounter: Encounter }
+  | { type: "reveal_finished" }
   | { type: "support_delivered" }
   | { type: "go_home" }
   | { type: "open_letter" };
@@ -72,7 +74,9 @@ export function deviceReducer(state: DeviceState, action: DeviceAction): DeviceS
       if (action.encounter.status === "empty") {
         return { ...state, encounter: null, screen: "empty" };
       }
-      return { ...state, encounter: action.encounter, screen: "encounter" };
+      return { ...state, encounter: action.encounter, screen: action.encounter.content_type === "peer_post" ? "peer_reveal" : "encounter" };
+    case "reveal_finished":
+      return state.screen === "peer_reveal" ? { ...state, screen: "encounter" } : state;
     case "support_delivered":
       return { ...state, screen: "support_sent" };
     case "open_letter":

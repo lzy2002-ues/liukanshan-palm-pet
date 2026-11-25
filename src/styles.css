@@ -105,6 +105,10 @@ button { font: inherit; cursor: pointer; }
 .matching-screen--meeting { padding: 22px 24px 16px; justify-content: flex-start; }
 .matching-screen--meeting .meeting-foxes { height: 317px; flex: none; gap: 35px; background: #eaf0f1 url("../assets/original/snow-hills-conifers.svg") center / 100% 100% no-repeat; }
 .matching-screen--meeting .meeting-fox .fox { transform: scale(1.7); }
+.peer-reveal-screen { position: relative; height: 100%; padding: 22px 24px 16px; }
+.peer-reveal-scene { width: 100%; height: 317px; border-radius: 17px; background: #eaf0f1 url("../assets/original/snow-hills-conifers.svg") center / 100% 100% no-repeat; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+.peer-reveal-scene .fox--large { margin: 0; }
+.peer-reveal-scene p { margin: 14px 0 0; color: #304b53; font-size: 18px; font-weight: 700; }
 .fox--violet img { filter: sepia(.46) saturate(1.25) hue-rotate(205deg) brightness(.99); }
 .meeting-foxes span { color: #85c2b5; animation: pulse 1.2s infinite; }
 .meeting-fox { display: grid; justify-items: center; gap: 10px; color: #617d85; font-size: 11px; }
@@ -118,6 +122,11 @@ button { font: inherit; cursor: pointer; }
 
 .encounter-close { position: absolute; top: 32px; right: 36px; z-index: 2; border: 0; background: transparent; color: #536a78; font-size: 24px; line-height: 1; }
 .encounter-card { position: relative; width: 100%; height: 317px; flex: none; margin: 0; padding: 0; border-radius: 17px; background: #eaf0f1 url("../assets/original/snow-hills-conifers.svg") center / 100% 100% no-repeat; text-align: left; }
+.encounter-card--peer { border: 1.5px solid #b0bed0; background: #fff; }
+.encounter-card--peer .encounter-card__speech { position: static; width: auto; min-height: 0; margin: 0; padding: 25px 22px; border: 0; background: transparent; }
+.encounter-card--peer .encounter-card__speech strong { padding-bottom: 14px; border-bottom: 1px solid #d7e2e8; font-size: 16px; }
+.encounter-card--peer .encounter-card__speech h2 { margin-top: 18px; font-size: 18px; line-height: 1.4; }
+.encounter-card--peer .encounter-card__speech .encounter-card__summary { margin-top: 12px; -webkit-line-clamp: 5; font-size: 14px; line-height: 1.5; }
 .encounter-card__topline { display: flex; justify-content: space-between; gap: 7px; }.source-pill { padding: 4px 7px; border-radius: 99px; background: #e5f3f5; color: #4e8995; font-size: 10px; }.source-pill--warm { background: #fff0e7; color: #b36d42; }.source-pill--quiet { background: #f0f3f3; color: #879b9f; }
 .encounter-card__body { display: flex; align-items: center; gap: 7px; margin-top: 8px; }.encounter-card__author { margin: 0; color: #82979c; font-size: 10px; }.encounter-card h2 { margin: 2px 0 0; color: #304b53; font-size: 16px; line-height: 1.3; }.zhihu-mark { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 10px; background: #e3f3f5; color: #4797aa; font-weight: 800; }
 .encounter-card__character { position: absolute; left: 44px; bottom: 29px; width: 80px; height: 132px; display: grid; place-items: center; }
@@ -134,16 +143,17 @@ button { font: inherit; cursor: pointer; }
 .expand-action { border: 0; padding: 5px 0 9px; background: transparent; color: #426d77; font-size: 11px; }
 .encounter-card__detail { border-top: 1px solid #d5e4e7; color: #516c75; font-size: 11px; line-height: 1.5; }
 .encounter-card__detail p { margin: 7px 0; }.encounter-card__detail small { color: #84979c; }
-.encounter-actions { position: absolute; top: 329px; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; padding: 0; }
+.encounter-actions { position: absolute; top: 329px; left: 0; width: 100%; padding: 0; }
 .encounter-zhihu-action { position: absolute; top: 331px; left: 0; width: 100%; height: 55px; border: 1px solid #b0bed0; border-radius: 7px; background: #536a78; color: #fff; font-size: 13px; }
-.support-hold { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 54px; height: 54px; border: 1px solid #9db9c1; border-radius: 50%; background: #536a78; color: white; font-size: 9px; font-weight: 700; touch-action: none; box-shadow: 0 3px 7px #536a7826; }
-.support-hold__fill { position: absolute; inset: 0; transform: scaleY(0); transform-origin: bottom; background: #83baa9; }
+.support-hold { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; width: 100%; height: 55px; border: 0; border-radius: 7px; background: #536a78; color: white; font-size: 14px; font-weight: 700; touch-action: none; }
+.support-hold__fill { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: #83baa9; }
 .support-hold.is-holding .support-hold__fill { animation: hold-fill .7s linear forwards; }
-.support-hold__heart, .support-hold__copy { position: relative; z-index: 1; }
-.support-hold__heart { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: #ffffff2e; color: #ffe4dc; font-size: 14px; }
-.support-hold.is-holding .support-hold__heart { animation: heart-beat .35s ease-in-out infinite alternate; }
-@keyframes heart-beat { to { transform: scale(1.18); } }
-@keyframes hold-fill { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.support-hold__thumb { position: absolute; z-index: 1; left: 12px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #ffffff2e; color: #fff; }
+.support-hold__thumb svg { width: 19px; height: 19px; }
+.support-hold__copy { position: relative; z-index: 1; }
+.support-hold.is-holding .support-hold__thumb { animation: thumb-slide .7s linear forwards; }
+@keyframes thumb-slide { to { left: calc(100% - 44px); } }
+@keyframes hold-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .zhihu-guide { border: 0; background: transparent; color: #536f7c; font-size: 11px; padding: 4px; }
 .support-result-screen { position: relative; width: calc(100% - 48px); height: calc(100% - 44px); margin: 22px auto; padding: 24px; border: 1.5px solid #b0bed0; border-radius: 17px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .support-result-close { position: absolute; top: 8px; right: 10px; border: 0; background: transparent; color: #536a78; font-size: 25px; line-height: 1; }
