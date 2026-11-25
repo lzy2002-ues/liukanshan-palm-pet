@@ -55,11 +55,11 @@ export function deviceReducer(state: DeviceState, action: DeviceAction): DeviceS
     case "avatar_confirmed":
       return { ...state, petAvatarId: action.petAvatarId, screen: "home" };
     case "talk_started":
-      return { ...state, screen: "conversation" };
+      return { ...state, screen: "home" };
     case "conversation_updated":
       return {
         ...state,
-        screen: "conversation",
+        screen: "home",
         conversation: action.bubbles,
         showZhihuSuggestion: action.showZhihuSuggestion,
       };

@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { requestEncounter, sendSupport } from "./api/encounterApi";
 import type { PetAvatarId } from "./contracts";
@@ -18,19 +18,32 @@ export default function App() {
   const [state, dispatch] = useReducer(deviceReducer, undefined, () => createInitialDeviceState());
   const [selectedAvatar, setSelectedAvatar] = useState<PetAvatarId>("liukanshan_03");
   const [isListening, setIsListening] = useState(false);
+  const [voicePhase, setVoicePhase] = useState<"idle" | "user" | "pet" | "action">("idle");
   const [phoneHint, setPhoneHint] = useState(false);
   const [supportPending, setSupportPending] = useState(false);
   const [supportError, setSupportError] = useState(false);
   const shakeInFlight = useRef(false);
   const supportInFlight = useRef(false);
   const displayTime = useMemo(formatTime, []);
+  const voiceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const voiceRun = useRef(0);
+
+  useEffect(() => () => { if (voiceTimer.current) clearTimeout(voiceTimer.current); }, []);
+
+  const clearVoice = () => {
+    voiceRun.current += 1;
+    if (voiceTimer.current) clearTimeout(voiceTimer.current);
+    setVoicePhase("idle");
+  };
 
   const startTalking = () => {
+    clearVoice();
     setIsListening(true);
     dispatch({ type: "talk_started" });
   };
 
   const finishTalking = () => {
+    if (!isListening) return;
     setIsListening(false);
     dispatch({
       type: "conversation_updated",
@@ -39,14 +52,26 @@ export default function App() {
         { id: "user-job", role: "user", text: "最近找工作有点焦虑。" },
         { id: "pet-answer", role: "pet", text: "听起来你扛了很多，我陪你慢一点整理。" },
       ],
-      showZhihuSuggestion: true,
+      showZhihuSuggestion: false,
     });
+    const run = ++voiceRun.current;
+    setVoicePhase("user");
+    voiceTimer.current = setTimeout(() => {
+      if (run !== voiceRun.current) return;
+      setVoicePhase("pet");
+      voiceTimer.current = setTimeout(() => {
+        if (run !== voiceRun.current) return;
+        setVoicePhase("action");
+        voiceTimer.current = setTimeout(() => { if (run === voiceRun.current) setVoicePhase("idle"); }, 5000);
+      }, 4500);
+    }, 2300);
   };
 
   const shake = async () => {
     if (shakeInFlight.current || state.screen === "matching") return;
     shakeInFlight.current = true;
-    const sessionId = state.screen === "conversation" ? "ses_zhihu_help" : "ses_job_search";
+    clearVoice();
+    const sessionId = state.conversation.length > 1 ? "ses_job_search" : null;
     dispatch({ type: "shake_started" });
     try {
       const response = await requestEncounter({
@@ -106,12 +131,15 @@ export default function App() {
       {state.screen === "home" && (
         <section className="home-screen">
           <header className="status-line"><span>{displayTime}</span><span>● 已连接</span></header>
-          <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
+          <div className="home-snow"><div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
+            {isListening && <div className="voice-overlay" role="status"><span className="voice-wave" aria-hidden="true">▂ ▅ ▇ ▃ ▆ ▂</span><strong>正在听你说…</strong></div>}
+            {!isListening && voicePhase !== "idle" && <div className={`voice-bubble voice-bubble--${voicePhase}`} role="status">{voicePhase === "user" ? "你：最近找工作有点焦虑。" : "刘看山：我记住啦，想不想遇见有相似经历的小看山？"}</div>}
+          </div>
           <p className="eyebrow">刘看山在这儿</p>
           <h1>今天也陪着你</h1>
-          <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>
+          {voicePhase === "action" ? <button className="inline-action" onClick={shake} type="button">去摇一摇 · 遇见共鸣</button> : <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>}
           <div className="home-actions">
-            <button className="ghost-action" onClick={startTalking} type="button">按住说话</button>
+            <button className={isListening ? "recording-action" : "ghost-action"} onClick={isListening ? finishTalking : startTalking} type="button">{isListening ? "松开，发送" : "按住说话"}</button>
             <button className="primary-action" onClick={shake} type="button">摇一摇遇见</button>
           </div>
           {state.unreadLetters > 0 && <button className="letter-dot" onClick={() => dispatch({ type: "open_letter" })} type="button">✉ {state.unreadLetters} 封来信</button>}
@@ -141,8 +169,7 @@ export default function App() {
 
       {state.screen === "matching" && (
         <section className="matching-screen">
-          <div className="shake-orbit" aria-hidden="true">✧</div>
-          <FoxMark tone={avatarTone(state.petAvatarId)} size="normal" />
+          <div className="meeting-foxes" aria-label="两只看山正在相遇"><FoxMark tone={avatarTone(state.petAvatarId)} size="normal" /><span>✧ · ✧</span><FoxMark tone="violet" size="normal" /></div>
           <h1>正在遇见…</h1>
           <p>刘看山正在替你翻一翻世界。</p>
         </section>
@@ -150,7 +177,7 @@ export default function App() {
 
       {state.screen === "encounter" && state.encounter && (
         <section className="encounter-screen">
-          <header className="conversation-header"><button onClick={() => dispatch({ type: "go_home" })} type="button">‹</button><span>摇一摇奇遇</span><span /></header>
+          <header className="conversation-header"><span /><span>摇一摇奇遇</span><button aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button></header>
           <EncounterCard encounter={state.encounter} isSupportPending={supportPending} onSupport={support} onOpenPhone={() => setPhoneHint(true)} />
           {phoneHint && <p className="phone-hint">已为手机端准备详情入口</p>}
           {supportError && <p className="phone-hint">这份心意暂时没能送达，请稍后再试。</p>}

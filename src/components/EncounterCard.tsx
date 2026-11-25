@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { MatchedEncounter } from "../contracts";
 import { FoxMark } from "./AvatarCarousel";
 
@@ -18,6 +19,7 @@ const toneByAvatar: Record<string, string> = {
 };
 
 export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPending }: EncounterCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const isPeer = encounter.content_type === "peer_post";
   const sourceLabel = encounter.source === "demo" ? "演示内容 · 知乎经验" : isPeer ? "匿名奇遇" : "知乎经验";
   const avatarTone = encounter.peer_author
@@ -42,7 +44,8 @@ export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPend
         </div>
       </div>
       <p className="encounter-card__summary">{encounter.summary}</p>
-      <p className="encounter-card__reason">{encounter.match_reason}</p>
+      <button className="expand-action" aria-expanded={expanded} onClick={() => setExpanded(!expanded)} type="button">{expanded ? "收起内容 ↑" : "展开看看 ↓"}</button>
+      {expanded && <div className="encounter-card__detail"><p>{encounter.summary}</p><p>{encounter.match_reason}</p><small>{isPeer ? "仅展示对方确认公开的匿名内容" : "完整内容请前往知乎查看"}</small></div>}
       {encounter.can_support ? (
         <div className="support-row">
           {encounter.support_options.map((option) => (
