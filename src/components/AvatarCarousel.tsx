@@ -1,4 +1,5 @@
 import type { PetAvatarId } from "../contracts";
+import liukanshanFront from "../../assets/original/liukanshan-front-reference.jpg";
 
 export const avatarOptions: Array<{ id: PetAvatarId; name: string; tone: string }> = [
   { id: "liukanshan_01", name: "云朵白", tone: "snow" },
@@ -16,15 +17,8 @@ interface AvatarCarouselProps {
 
 export function FoxMark({ tone = "snow", size = "normal" }: { tone?: string; size?: "small" | "normal" | "large" }) {
   return (
-    <div className={`fox fox--${tone} fox--${size}`} aria-hidden="true">
-      <span className="fox__ear fox__ear--left" />
-      <span className="fox__ear fox__ear--right" />
-      <span className="fox__face">
-        <i className="fox__eye fox__eye--left" />
-        <i className="fox__eye fox__eye--right" />
-        <i className="fox__nose" />
-      </span>
-      <span className="fox__body" />
+    <div className={`fox fox--photo fox--${tone} fox--${size}`} aria-hidden="true">
+      <img src={liukanshanFront} alt="" draggable="false" />
     </div>
   );
 }

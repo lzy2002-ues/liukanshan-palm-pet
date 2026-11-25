@@ -31,7 +31,7 @@ npm run dev
 1. 选择六个固定匿名形象之一；
 2. 在首页按住「按住说话」查看按钮内声波，松开后依次看到临时气泡；
 3. 点击设备外的「模拟摇动设备」（实机由加速度计触发），看到两只形象相遇，再出现对方形象与帖子概要；
-4. 展开概要或长按「长按助力」约 0.7 秒，查看发送反馈。
+4. 展开概要或按住「按住送个抱抱」约 0.7 秒，查看填充反馈和发送结果。
 
 验证命令：
 
@@ -44,6 +44,6 @@ npm run build
 
 - 浏览器 Mock 的唯一接口替换点是 [`src/api/encounterApi.ts`](src/api/encounterApi.ts)。真实后端接入时保留 [`src/contracts.ts`](src/contracts.ts) 的字段，并将 Mock 函数替换为对 `POST /encounters/shake` 与 `POST /encounters/{encounter_id}/support` 的调用。
 - 浏览器触发传 `trigger_source: "mock"`；ESP32 固件在本地 IMU 判定摇动后传 `trigger_source: "imu"`。两端都使用相同的请求体，不在设备或浏览器保存知乎密钥。
-- 本项目没有接入扬声器、真实录音、ASR、LLM、知乎 API 或 ESP32/LVGL 固件；六个形象现为可替换的 CSS 占位表现，不是官方素材。
+- 本项目没有接入扬声器、真实录音、ASR、LLM、知乎 API 或 ESP32/LVGL 固件；当前六个头像 ID 共用项目成员提供的一张刘看山参考图，正式六套形象待替换，详见 [`docs/asset-inventory.md`](docs/asset-inventory.md)。
 - 「看看相关知乎经验」当前只演示手机端引导，尚未检索到真实知乎链接；没有知乎收藏写入能力，不会声称已同步到知乎收藏。
 
