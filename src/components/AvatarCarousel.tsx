@@ -1,5 +1,5 @@
 import type { PetAvatarId } from "../contracts";
-import liukanshanFront from "../../assets/original/liukanshan-front-reference.jpg";
+import liukanshanFront from "../../assets/processed/liukanshan-front-cutout.png";
 
 export const avatarOptions: Array<{ id: PetAvatarId; name: string; tone: string }> = [
   { id: "liukanshan_01", name: "云朵白", tone: "snow" },

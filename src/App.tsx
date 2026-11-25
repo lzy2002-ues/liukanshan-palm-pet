@@ -101,11 +101,12 @@ export default function App() {
     setSupportPending(true);
     setSupportError(false);
     try {
-      await sendSupport(state.encounter.encounter_id, {
+      const response = await sendSupport(state.encounter.encounter_id, {
         message_id: messageId,
         client_request_id: `support-${crypto.randomUUID()}`,
       });
-      dispatch({ type: "support_delivered" });
+      if (response.data.delivery_status === "not_delivered") setSupportError(true);
+      else dispatch({ type: "support_delivered" });
     } catch {
       setSupportError(true);
     } finally {
@@ -134,14 +135,13 @@ export default function App() {
 
       {state.screen === "home" && (
         <section className="home-screen">
-          <header className="status-line"><span>{displayTime}</span><span>● 已连接</span></header>
-          <div className="home-snow"><div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
+          <div className="home-snow">
+            <header className="status-line"><span>{displayTime}</span><span>● 已连接</span></header>
+            <div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
+            {!isListening && voicePhase === "idle" && <div className="home-greeting"><strong>刘看山</strong><span>我在这儿。想说什么，慢慢告诉我。</span></div>}
             {isListening && <div className="voice-overlay" role="status"><strong>正在听你说…</strong></div>}
             {!isListening && voicePhase !== "idle" && <div className={`voice-bubble voice-bubble--${voicePhase}`} role="status">{voicePhase === "user" ? "你：最近找工作有点焦虑。" : "刘看山：我记住啦，想不想遇见有相似经历的小看山？"}</div>}
           </div>
-          <p className="eyebrow">刘看山在这儿</p>
-          <h1>今天也陪着你</h1>
-          {voicePhase === "action" ? <p className="home-copy">想遇见相似经历？轻轻摇动掌机。</p> : <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>}
           <div className="home-actions">
             <button
               className={isListening ? "recording-action" : "primary-action"}
@@ -174,7 +174,7 @@ export default function App() {
       {state.screen === "encounter" && state.encounter && (
         <section className="encounter-screen">
           <header className="conversation-header"><span /><span>摇一摇奇遇</span><button aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button></header>
-          <EncounterCard encounter={state.encounter} isSupportPending={supportPending} onSupport={support} onOpenPhone={() => setPhoneHint(true)} />
+          <EncounterCard encounter={state.encounter} isSupportPending={supportPending} onSupport={support} onOpenZhihu={() => setPhoneHint(true)} />
           {phoneHint && <p className="phone-hint">演示：手机端将展示相关知乎内容，当前未接真实链接。</p>}
           {supportError && <p className="phone-hint">这份心意暂时没能送达，请稍后再试。</p>}
         </section>
@@ -190,12 +190,12 @@ export default function App() {
       )}
 
       {state.screen === "support_sent" && (
-        <section className="letter-screen">
-          <div className="envelope" aria-hidden="true">✉</div>
-          <p className="eyebrow">你的鼓励</p>
-          <h1>这份温柔已经出发啦。</h1>
-          <p>如果通过审核，它会成为对方的一封刘看山来信。</p>
-          <button className="primary-action" onClick={() => dispatch({ type: "go_home" })} type="button">回到首页</button>
+        <section className="support-result-screen">
+          <button className="support-result-close" aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button>
+          <div className="envelope" aria-hidden="true">♥</div>
+          <p className="eyebrow">送给{state.encounter?.peer_author?.display_name ?? "远方的小看山"}</p>
+          <h1>你的助力已送出</h1>
+          <p>通过审核后，会成为对方的一封刘看山来信。</p>
         </section>
       )}
 

@@ -268,6 +268,8 @@ interface ZhihuContentMeta {
 - `client_request_id` 同样幂等；用户双击或重试只能产生一条助力。
 - 后端创建助力后，异步写入原作者的来信；因审核、撤回或内容下架无法投递时，用 `delivery_status=not_delivered` 返回，前端显示“这份心意暂时没能送达”。
 - 不允许助力者与原作者建立聊天、关注或任何可识别身份关系。
+- 当 `delivery_status=queued` 时，设备只提示“你的助力已送出，审核后送达”，不能声称对方已经收到。成功页可展示 `peer_author.display_name`，不得展示 `anonymous_author_id`、真实用户 ID 或知乎账号 ID。
+- `content_type=peer_post` 的帖子属于产品匿名池，没有知乎帖子链接；该页面不展示“相关知乎经验”或“去知乎看这位用户的帖子”。只有 `zhihu_content.url` 非空且来源真实可用的知乎内容，才可引导用户在手机端打开知乎原文。
 
 ## 7. 原作者的来信
 

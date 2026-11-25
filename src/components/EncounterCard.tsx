@@ -5,7 +5,7 @@ import { FoxMark } from "./AvatarCarousel";
 interface EncounterCardProps {
   encounter: MatchedEncounter;
   onSupport: (messageId: string) => void;
-  onOpenPhone: () => void;
+  onOpenZhihu: () => void;
   isSupportPending: boolean;
 }
 
@@ -18,7 +18,7 @@ const toneByAvatar: Record<string, string> = {
   liukanshan_06: "peach",
 };
 
-export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPending }: EncounterCardProps) {
+export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPending }: EncounterCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,12 +77,11 @@ export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPend
           >
             <span className="support-hold__fill" aria-hidden="true" />
             <span className="support-hold__heart" aria-hidden="true">♥</span>
-            <span className="support-hold__copy">{isSupportPending ? "小心意正在送出…" : isHolding ? "抱抱正在送达…" : "按住送个抱抱"}</span>
+            <span className="support-hold__copy">{isSupportPending ? "送出中" : isHolding ? "再等等" : "按住助力"}</span>
           </button>
-          <button className="zhihu-guide" onClick={onOpenPhone} type="button">看看相关知乎经验 ↗</button>
         </div>
       ) : (
-        <button className="outline-action" onClick={onOpenPhone} type="button">去知乎查看 ↗</button>
+        <button className="outline-action" onClick={onOpenZhihu} type="button">{encounter.source === "demo" ? "演示：前往知乎查看" : "前往知乎查看 ↗"}</button>
       )}
     </div>
   );

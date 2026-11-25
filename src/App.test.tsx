@@ -12,7 +12,7 @@ describe("摇一摇掌机 Mock", () => {
     await user.click(screen.getByRole("button", { name: "选中 北极蓝" }));
     await user.click(screen.getByRole("button", { name: "我选好了" }));
 
-    expect(screen.getByText("今天也陪着你")).toBeInTheDocument();
+    expect(screen.getByText("我在这儿。想说什么，慢慢告诉我。")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "摇一摇遇见" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "模拟摇动设备" })).toBeInTheDocument();
   });
@@ -43,12 +43,16 @@ describe("摇一摇掌机 Mock", () => {
     await waitFor(() => expect(screen.getByText("找工作时总觉得自己不够好，怎么办？")).toBeInTheDocument(), { timeout: 3500 });
     await user.click(screen.getByRole("button", { name: "展开看看 ↓" }));
     expect(screen.getByText("仅展示对方确认公开的匿名内容")).toBeInTheDocument();
-    const supportButton = screen.getByRole("button", { name: "按住送个抱抱" });
+    expect(screen.queryByRole("button", { name: /知乎/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("anon_8f2b")).not.toBeInTheDocument();
+    const supportButton = screen.getByRole("button", { name: "按住助力" });
     fireEvent.pointerDown(supportButton);
     await new Promise((resolve) => setTimeout(resolve, 750));
     fireEvent.pointerUp(supportButton);
 
-    await waitFor(() => expect(screen.getByText("这份温柔已经出发啦。" )).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("你的助力已送出" )).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "关闭，返回首页" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "回到首页" })).not.toBeInTheDocument();
     expect(screen.queryByText("一封新的来信")).not.toBeInTheDocument();
   });
 });
