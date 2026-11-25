@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MatchedEncounter } from "../contracts";
 import { FoxMark } from "./AvatarCarousel";
 
@@ -20,14 +20,32 @@ const toneByAvatar: Record<string, string> = {
 
 export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPending }: EncounterCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [isHolding, setIsHolding] = useState(false);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (holdTimer.current) clearTimeout(holdTimer.current); }, []);
   const isPeer = encounter.content_type === "peer_post";
   const sourceLabel = encounter.source === "demo" ? "演示内容 · 知乎经验" : isPeer ? "匿名奇遇" : "知乎经验";
   const avatarTone = encounter.peer_author
     ? toneByAvatar[encounter.peer_author.pet_avatar_id] ?? "snow"
     : "blue";
+  const supportOption = encounter.support_options[0];
+  const cancelHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+    setIsHolding(false);
+  };
+  const beginHold = () => {
+    if (!supportOption || isSupportPending) return;
+    setIsHolding(true);
+    holdTimer.current = setTimeout(() => {
+      holdTimer.current = null;
+      setIsHolding(false);
+      onSupport(supportOption.message_id);
+    }, 700);
+  };
 
   return (
-    <div className="encounter-card" data-content-type={encounter.content_type} data-source={encounter.source}>
+    <div className={`encounter-card ${expanded ? "is-expanded" : ""}`} data-content-type={encounter.content_type} data-source={encounter.source}>
       <div className="encounter-card__topline">
         <span className={`source-pill ${isPeer ? "source-pill--warm" : ""}`}>
           {sourceLabel}
@@ -45,17 +63,22 @@ export function EncounterCard({ encounter, onSupport, onOpenPhone, isSupportPend
       <button className="expand-action" aria-expanded={expanded} onClick={() => setExpanded(!expanded)} type="button">{expanded ? "收起内容 ↑" : "展开看看 ↓"}</button>
       {expanded && <div className="encounter-card__detail"><p>{encounter.match_reason}</p><small>{isPeer ? "仅展示对方确认公开的匿名内容" : "完整内容请前往知乎查看"}</small></div>}
       {encounter.can_support ? (
-        <div className="support-row">
-          {encounter.support_options.map((option) => (
-            <button disabled={isSupportPending} key={option.message_id} onClick={() => onSupport(option.message_id)} type="button">
-              {isSupportPending ? "正在送出…" : option.label}
-            </button>
-          ))}
+        <div className="encounter-actions">
+          <button
+            className={`support-hold ${isHolding ? "is-holding" : ""}`}
+            disabled={isSupportPending || !supportOption}
+            onPointerDown={beginHold}
+            onPointerUp={cancelHold}
+            onPointerLeave={cancelHold}
+            onPointerCancel={cancelHold}
+            onKeyDown={(event) => { if (!event.repeat && (event.key === " " || event.key === "Enter")) { event.preventDefault(); beginHold(); } }}
+            onKeyUp={(event) => { if (event.key === " " || event.key === "Enter") { event.preventDefault(); cancelHold(); } }}
+            type="button"
+          >{isSupportPending ? "正在送出…" : "长按助力"}</button>
+          <button className="zhihu-guide" onClick={onOpenPhone} type="button">看看相关知乎经验 ↗</button>
         </div>
       ) : (
-        <button className="outline-action" onClick={onOpenPhone} type="button">
-          去手机看详情
-        </button>
+        <button className="outline-action" onClick={onOpenPhone} type="button">去知乎查看 ↗</button>
       )}
     </div>
   );

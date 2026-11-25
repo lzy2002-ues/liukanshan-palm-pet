@@ -136,14 +136,24 @@ export default function App() {
         <section className="home-screen">
           <header className="status-line"><span>{displayTime}</span><span>● 已连接</span></header>
           <div className="home-snow"><div className="home-pet"><FoxMark tone={avatarTone(state.petAvatarId)} size="large" /></div>
-            {isListening && <div className="voice-overlay" role="status"><span className="voice-wave" aria-hidden="true">▂ ▅ ▇ ▃ ▆ ▂</span><strong>正在听你说…</strong></div>}
+            {isListening && <div className="voice-overlay" role="status"><strong>正在听你说…</strong></div>}
             {!isListening && voicePhase !== "idle" && <div className={`voice-bubble voice-bubble--${voicePhase}`} role="status">{voicePhase === "user" ? "你：最近找工作有点焦虑。" : "刘看山：我记住啦，想不想遇见有相似经历的小看山？"}</div>}
           </div>
           <p className="eyebrow">刘看山在这儿</p>
           <h1>今天也陪着你</h1>
           {voicePhase === "action" ? <p className="home-copy">想遇见相似经历？轻轻摇动掌机。</p> : <p className="home-copy">想说什么都可以。摇一摇，也许会遇见一封刚好懂你的信。</p>}
           <div className="home-actions">
-            <button className={isListening ? "recording-action" : "ghost-action"} onClick={isListening ? finishTalking : startTalking} type="button">{isListening ? "松开，发送" : "按住说话"}</button>
+            <button
+              className={isListening ? "recording-action" : "primary-action"}
+              onPointerDown={startTalking}
+              onPointerUp={finishTalking}
+              onPointerCancel={() => { setIsListening(false); clearVoice(); }}
+              onKeyDown={(event) => { if (!event.repeat && (event.key === " " || event.key === "Enter")) { event.preventDefault(); startTalking(); } }}
+              onKeyUp={(event) => { if (event.key === " " || event.key === "Enter") { event.preventDefault(); finishTalking(); } }}
+              type="button"
+            >
+              {isListening ? <><span className="button-wave" aria-hidden="true"><i /><i /><i /><i /><i /><i /></span>松开，发送</> : "按住说话"}
+            </button>
           </div>
           {state.unreadLetters > 0 && <button className="letter-dot" onClick={() => dispatch({ type: "open_letter" })} type="button">✉ {state.unreadLetters} 封来信</button>}
         </section>
@@ -165,9 +175,8 @@ export default function App() {
         <section className="encounter-screen">
           <header className="conversation-header"><span /><span>摇一摇奇遇</span><button aria-label="关闭，返回首页" onClick={() => dispatch({ type: "go_home" })} type="button">×</button></header>
           <EncounterCard encounter={state.encounter} isSupportPending={supportPending} onSupport={support} onOpenPhone={() => setPhoneHint(true)} />
-          {phoneHint && <p className="phone-hint">已为手机端准备详情入口</p>}
+          {phoneHint && <p className="phone-hint">演示：手机端将展示相关知乎内容，当前未接真实链接。</p>}
           {supportError && <p className="phone-hint">这份心意暂时没能送达，请稍后再试。</p>}
-          <button className="text-action" onClick={() => dispatch({ type: "go_home" })} type="button">先回去</button>
         </section>
       )}
 
