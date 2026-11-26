@@ -1,5 +1,5 @@
 import type { PetAvatarId } from "../contracts";
-import liukanshanFront from "../../assets/processed/liukanshan-front-cutout.png";
+import liukanshanFront from "../../assets/processed/liukanshan-front-cutout.png?inline";
 
 // Replace each value with its matching processed image when the six final assets arrive.
 export const avatarImageById: Record<PetAvatarId, string> = {
