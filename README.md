@@ -9,8 +9,9 @@
 1. [`docs/PRD-V1.0.md`](docs/PRD-V1.0.md)：当前产品基线。
 2. [`docs/PRODUCT.md`](docs/PRODUCT.md)：早期产品背景与隐私边界。
 3. [`docs/SHAKE_MODULE_API_CONTRACT.md`](docs/SHAKE_MODULE_API_CONTRACT.md)：摇一摇、六套匿名形象、助力与来信的联调字段。
-4. [`docs/zhihu-integration.md`](docs/zhihu-integration.md)：知乎官方能力的接入边界。
-5. [`AGENTS.md`](AGENTS.md)：让 Codex 参与开发前必须遵守的协作规则。
+4. [`docs/CONVERSATION_API_CONTRACT.md`](docs/CONVERSATION_API_CONTRACT.md)：按住说话、ASR、模型回复与会话 ID 字段。
+5. [`docs/zhihu-integration.md`](docs/zhihu-integration.md)：知乎官方能力的接入边界。
+6. [`AGENTS.md`](AGENTS.md)：让 Codex 参与开发前必须遵守的协作规则。
 
 ## 协作约定
 
@@ -42,7 +43,8 @@ npm run build
 
 ### 联调替换点
 
-- 浏览器 Mock 的唯一接口替换点是 [`src/api/encounterApi.ts`](src/api/encounterApi.ts)。真实后端接入时保留 [`src/contracts.ts`](src/contracts.ts) 的字段，并将 Mock 函数替换为对 `POST /encounters/shake` 与 `POST /encounters/{encounter_id}/support` 的调用。
+- 浏览器使用 [`src/api/conversationApi.ts`](src/api/conversationApi.ts) 和 [`src/api/encounterApi.ts`](src/api/encounterApi.ts) 的 Mock。已准备 [`src/api/httpAdapters.ts`](src/api/httpAdapters.ts) 对接转写、对话、摇动与助力四个后端路由；真实登录和服务端完成后注入 `App`，当前不自动启用。
+- 首页同学的「进入对话」接 `open_conversation`；对话后端的 `session_id` 保留到摇动请求，聊天本身不会自动匹配。每页背景图从 [`src/theme/sceneAssets.ts`](src/theme/sceneAssets.ts) 替换，形象图从 [`src/components/AvatarCarousel.tsx`](src/components/AvatarCarousel.tsx) 替换。
 - 浏览器触发传 `trigger_source: "mock"`；ESP32 固件在本地 IMU 判定摇动后传 `trigger_source: "imu"`。两端都使用相同的请求体，不在设备或浏览器保存知乎密钥。
 - 对方字段固定为 `peer_author.anonymous_author_id`（内部匿名标识）、`peer_author.display_name`（界面昵称）和 `peer_author.pet_avatar_id`（六套形象 ID）；不下发真实用户 ID。六套图片只需替换 [`src/components/AvatarCarousel.tsx`](src/components/AvatarCarousel.tsx) 的 `avatarImageById` 映射。
 - 本项目没有接入扬声器、真实录音、ASR、LLM、知乎 API 或 ESP32/LVGL 固件；首页使用项目提供的 384×317 雪丘 SVG，六个头像 ID 暂时共用一张刘看山透明处理图，正式六套形象待替换，详见 [`docs/asset-inventory.md`](docs/asset-inventory.md)。

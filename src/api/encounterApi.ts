@@ -6,6 +6,11 @@ import type {
   SupportResponse,
 } from "../contracts";
 
+export interface EncounterApi {
+  requestEncounter(request: ShakeRequest): Promise<ShakeResponse>;
+  sendSupport(encounterId: string, request: SupportRequest): Promise<SupportResponse>;
+}
+
 const encounterRequests = new Map<string, ShakeResponse>();
 const supportRequests = new Map<string, SupportResponse>();
 const createdAt = "2026-11-24T08:00:01.000Z";
@@ -19,6 +24,7 @@ const peerEncounter: Encounter = {
   content_id: "post_02f4",
   title: "找工作时总觉得自己不够好，怎么办？",
   summary: "最近投了几次简历，越准备越焦虑。有人也正在慢慢找回自己的节奏。",
+  detail_text: "我投了几次简历都没有回音，准备得越认真越容易怀疑自己。想听听大家怎样在求职时慢慢找回节奏。",
   match_reason: "和你刚才聊到的求职压力有关",
   can_support: true,
   support_options: [
@@ -43,6 +49,7 @@ const zhihuEncounter: Encounter = {
   content_id: "123456789",
   title: "求职低谷期，如何恢复节奏？",
   summary: "一位答主分享了自己调整求职心态的方法，或许能给你一点新的视角。",
+  detail_text: null,
   match_reason: "我帮你找到一条知乎经验",
   can_support: false,
   support_options: [],
@@ -107,3 +114,5 @@ export async function sendSupport(
   supportRequests.set(request.client_request_id, response);
   return response;
 }
+
+export const mockEncounterApi: EncounterApi = { requestEncounter, sendSupport };

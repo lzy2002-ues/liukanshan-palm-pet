@@ -1,24 +1,27 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 
-import { requestEncounter, sendSupport } from "./api/encounterApi";
+import { mockEncounterApi, type EncounterApi } from "./api/encounterApi";
+import { mockConversationApi, type ConversationApi } from "./api/conversationApi";
 import type { PetAvatarId } from "./contracts";
 import { AvatarCarousel, avatarOptions, FoxMark } from "./components/AvatarCarousel";
 import { DeviceShell } from "./components/DeviceShell";
 import { EncounterCard } from "./components/EncounterCard";
 import { LetterScreen } from "./components/LetterScreen";
 import { createInitialDeviceState, deviceReducer } from "./state/deviceReducer";
+import { mockVoiceCapture, type VoiceCapture } from "./hardware/voiceCapture";
+import { sceneBackgroundByScreen } from "./theme/sceneAssets";
 
-const mockTranscript = "最近找工作有点焦虑，投了几次简历都没有回音，明明已经准备了很久，还是担心自己不够好。";
-const mockReplies = [
-  "我记住啦，想不想遇见有相似经历的小看山？",
-  "听起来这段时间很不容易。我在这儿，陪你慢慢整理。",
-];
+interface AppProps {
+  conversationApi?: ConversationApi;
+  voiceCapture?: VoiceCapture;
+  encounterApi?: EncounterApi;
+}
 
 function avatarTone(id: PetAvatarId | null) {
   return avatarOptions.find((option) => option.id === id)?.tone ?? "snow";
 }
 
-export default function App() {
+export default function App({ conversationApi = mockConversationApi, voiceCapture = mockVoiceCapture, encounterApi = mockEncounterApi }: AppProps = {}) {
   const [state, dispatch] = useReducer(deviceReducer, undefined, () => createInitialDeviceState());
   const [selectedAvatar, setSelectedAvatar] = useState<PetAvatarId>("liukanshan_03");
   const [isListening, setIsListening] = useState(false);
@@ -31,13 +34,10 @@ export default function App() {
   const supportInFlight = useRef(false);
   const matchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const replyIndex = useRef(0);
   const voiceRun = useRef(0);
 
   useEffect(() => () => {
-    if (replyTimer.current) clearTimeout(replyTimer.current);
     if (previewTimer.current) clearTimeout(previewTimer.current);
     if (matchTimer.current) clearTimeout(matchTimer.current);
     if (revealTimer.current) clearTimeout(revealTimer.current);
@@ -45,49 +45,60 @@ export default function App() {
 
   const clearVoice = () => {
     voiceRun.current += 1;
-    if (replyTimer.current) clearTimeout(replyTimer.current);
+    voiceCapture.cancel();
     if (previewTimer.current) clearTimeout(previewTimer.current);
   };
 
   const startTalking = () => {
+    if (isListening) return;
     clearVoice();
+    voiceCapture.start();
     setUserPreview(null);
     setIsListening(true);
     dispatch({ type: "talk_started" });
   };
 
-  const finishTalking = () => {
+  const finishTalking = async () => {
     if (!isListening) return;
     setIsListening(false);
-    setUserPreview(mockTranscript);
-    dispatch({
-      type: "conversation_updated",
-      bubbles: [
-        { id: "pet-welcome", role: "pet", text: "我在呢，慢慢说也没关系。" },
-        { id: "user-job", role: "user", text: mockTranscript },
-        { id: "pet-answer", role: "pet", text: "听起来你扛了很多，我陪你慢一点整理。" },
-      ],
-      showZhihuSuggestion: false,
-    });
     const run = ++voiceRun.current;
-    previewTimer.current = setTimeout(() => {
-      if (run === voiceRun.current) setUserPreview(null);
-    }, 4500);
-    replyTimer.current = setTimeout(() => {
+    try {
+      const audio_file = await voiceCapture.stop();
+      const transcript = await conversationApi.transcribeSpeech({ audio_file, session_id: state.sessionId });
       if (run !== voiceRun.current) return;
-      setReplyText(mockReplies[replyIndex.current % mockReplies.length]);
-      replyIndex.current += 1;
-    }, 650);
+      setUserPreview(transcript.data.text);
+      previewTimer.current = setTimeout(() => {
+        if (run === voiceRun.current) setUserPreview(null);
+      }, 4500);
+      const response = await conversationApi.sendChatMessage({
+        client_message_id: crypto.randomUUID(),
+        session_id: state.sessionId,
+        text: transcript.data.text,
+      });
+      if (run !== voiceRun.current) return;
+      dispatch({
+        type: "conversation_updated",
+        sessionId: response.data.session_id,
+        bubbles: [
+          { id: `user-${response.data.message_id}`, role: "user", text: transcript.data.text },
+          { id: response.data.message_id, role: "pet", text: response.data.reply },
+        ],
+        showZhihuSuggestion: response.data.suggest_shake,
+      });
+      setReplyText(response.data.reply);
+    } catch {
+      if (run === voiceRun.current) setReplyText("刚才没听清，再和我说一次好吗？");
+    }
   };
 
   const shake = async () => {
     if (shakeInFlight.current || state.screen === "matching") return;
     shakeInFlight.current = true;
     clearVoice();
-    const sessionId = state.conversation.length > 1 ? "ses_job_search" : null;
+    const sessionId = state.sessionId;
     dispatch({ type: "shake_started" });
     try {
-      const response = await requestEncounter({
+      const response = await encounterApi.requestEncounter({
         request_id: `mock-${crypto.randomUUID()}`,
         session_id: sessionId,
         trigger_source: "mock",
@@ -115,7 +126,7 @@ export default function App() {
     setSupportPending(true);
     setSupportError(false);
     try {
-      const response = await sendSupport(state.encounter.encounter_id, {
+      const response = await encounterApi.sendSupport(state.encounter.encounter_id, {
         message_id: messageId,
         client_request_id: `support-${crypto.randomUUID()}`,
       });
@@ -130,7 +141,7 @@ export default function App() {
   };
 
   return (
-    <DeviceShell label="刘看山掌机交互演示" onSimulateShake={shake} showSimulator={state.screen === "home" || state.screen === "conversation"}>
+    <DeviceShell label="刘看山掌机交互演示" onSimulateShake={shake} showSimulator={state.screen === "home" || state.screen === "conversation"} sceneBackgroundUrl={sceneBackgroundByScreen[state.screen]}>
       {state.screen === "avatar_picker" && (
         <section className="onboarding-screen">
           <span className="step-label">第一次见面</span>

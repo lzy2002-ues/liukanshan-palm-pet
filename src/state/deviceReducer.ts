@@ -20,6 +20,7 @@ export interface ConversationBubble {
 export interface DeviceState {
   screen: DeviceScreen;
   petAvatarId: PetAvatarId | null;
+  sessionId: string | null;
   encounter: MatchedEncounter | null;
   unreadLetters: number;
   conversation: ConversationBubble[];
@@ -30,7 +31,7 @@ export type DeviceAction =
   | { type: "avatar_confirmed"; petAvatarId: PetAvatarId }
   | { type: "open_conversation" }
   | { type: "talk_started" }
-  | { type: "conversation_updated"; bubbles: ConversationBubble[]; showZhihuSuggestion: boolean }
+  | { type: "conversation_updated"; sessionId: string; bubbles: ConversationBubble[]; showZhihuSuggestion: boolean }
   | { type: "shake_started" }
   | { type: "encounter_received"; encounter: Encounter }
   | { type: "reveal_finished" }
@@ -46,6 +47,7 @@ export function createInitialDeviceState(petAvatarId: PetAvatarId | null = null)
   return {
     screen: petAvatarId ? "home" : "avatar_picker",
     petAvatarId,
+    sessionId: null,
     encounter: null,
     unreadLetters: 0,
     conversation: starterConversation,
@@ -65,6 +67,7 @@ export function deviceReducer(state: DeviceState, action: DeviceAction): DeviceS
       return {
         ...state,
         screen: "conversation",
+        sessionId: action.sessionId,
         conversation: action.bubbles,
         showZhihuSuggestion: action.showZhihuSuggestion,
       };

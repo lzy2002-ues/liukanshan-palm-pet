@@ -37,6 +37,7 @@ export function EncounterCard({ encounter, onSupport, onOpenZhihu, isSupportPend
         <strong>{isPeer ? `${encounter.peer_author?.display_name ?? "一位看山"}的分享` : "刘看山发现了"}</strong>
         <h2>{encounter.title}</h2>
         <p className="encounter-card__summary">{encounter.summary}</p>
+        {isPeer && encounter.detail_text && <p className="encounter-card__detail-text">{encounter.detail_text}</p>}
       </div>
       {encounter.can_support ? (
         <div className="encounter-actions">

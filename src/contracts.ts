@@ -21,6 +21,33 @@ export interface ShakeRequest {
   client_triggered_at: string;
 }
 
+export interface SpeechTranscribeRequest {
+  audio_file: Blob;
+  session_id: string | null;
+}
+
+export interface SpeechTranscribeResponse {
+  data: { text: string; duration_ms: number };
+}
+
+export interface ChatMessageRequest {
+  client_message_id: string;
+  session_id: string | null;
+  text: string;
+}
+
+export interface ChatMessageResponse {
+  data: {
+    message_id: string;
+    session_id: string;
+    reply: string;
+    emotion: string | null;
+    session_summary: string | null;
+    suggest_shake: boolean;
+    zhihu_suggestion: string | null;
+  };
+}
+
 export interface SupportRequest {
   message_id: string;
   client_request_id: string;
@@ -56,6 +83,7 @@ export interface MatchedEncounter {
   content_id: string;
   title: string;
   summary: string;
+  detail_text: string | null;
   match_reason: string;
   can_support: boolean;
   support_options: SupportOption[];

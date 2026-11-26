@@ -161,6 +161,7 @@ interface ZhihuContentMeta {
     "content_id": "post_02f4",
     "title": "找工作时总觉得自己不够好，怎么办？",
     "summary": "最近投了几次简历，越准备越焦虑……",
+    "detail_text": "我投了几次简历都没有回音，想听听大家怎样慢慢找回节奏。",
     "match_reason": "和你刚才聊到的求职压力有关",
     "can_support": true,
     "support_options": [
@@ -213,6 +214,7 @@ interface ZhihuContentMeta {
     "content_id": "123456789",
     "title": "求职低谷期，如何恢复节奏？",
     "summary": "一位答主分享了自己调整求职心态的方法……",
+    "detail_text": null,
     "match_reason": "为你找到一条知乎经验",
     "can_support": false,
     "support_options": [],
@@ -270,7 +272,7 @@ interface ZhihuContentMeta {
 - 不允许助力者与原作者建立聊天、关注或任何可识别身份关系。
 - 当 `delivery_status=queued` 时，设备只提示“你的助力已送出，审核后送达”，不能声称对方已经收到。成功页可展示 `peer_author.display_name`，不得展示 `anonymous_author_id`、真实用户 ID 或知乎账号 ID。
 - `content_type=peer_post` 的帖子属于产品匿名池，没有知乎帖子链接；该页面不展示“相关知乎经验”或“去知乎看这位用户的帖子”。只有 `zhihu_content.url` 非空且来源真实可用的知乎内容，才可引导用户在手机端打开知乎原文。
-- 设备上的情绪奇遇只把 `peer_author.display_name`、`title`、`summary` 组合成一条短气泡；不展示内部 ID，不再提供展开/收起。后端须给出适合小屏展示的简短摘要；完整匿名分享如未来需要在手机端查看，应新增产品自有详情路由，不能推测知乎主页或链接。
+- 设备上的情绪奇遇先单独显示 `peer_author.display_name` 和 `pet_avatar_id`，再在白框显示 `peer_author.display_name`、`title`、`summary`、`detail_text`；不展示内部 ID，不再提供展开/收起。`title`、`summary` 和 `detail_text` 由后端对**已获用户同意进入奇遇池**的内容生成/筛选，`detail_text` 可为 `null`，均须控制在小屏可读长度；不能把私人对话直接下发。若以后需要完整原文，应新增产品自有详情路由，不能推测知乎主页或链接。
 
 ## 7. 原作者的来信
 

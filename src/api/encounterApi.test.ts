@@ -21,6 +21,7 @@ describe("encounter Mock adapter", () => {
     expect(response.data.can_support).toBe(true);
     expect(response.data.peer_author?.pet_avatar_id).toBe("liukanshan_04");
     expect(response.data.peer_author).toMatchObject({ anonymous_author_id: "anon_8f2b", display_name: "小野看山" });
+    expect(response.data.detail_text).toContain("投了几次简历");
   });
 
   it("returns a Zhihu card without support actions for a knowledge request", async () => {
